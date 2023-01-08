@@ -1,4 +1,5 @@
 #include <iostream>
+#include "chess_main.h"
 #include "pieces\base.h"
 #include "pieces\pawn.h"
 #include "pieces\rook.h"
@@ -16,7 +17,7 @@ void printIsValid(Piece* piece, Square move, Board* board)
 ////////////////////////////////////////////////////////////////////
 /// Main
 ///=================================================================
-int main()
+int chess_test()
 {
     Piece* pawn1 = new Pawn(Team::WHITE);
     Piece* pawn2 = new Pawn(Team::BLACK);
@@ -35,6 +36,8 @@ int main()
     printIsValid(bishop1, Square(6, 6), board);
     printIsValid(bishop1, Square(4, 2), board);
     printIsValid(bishop1, Square(5, 1), board);
+
+    delete pawn1, pawn2, rook1, bishop1, board;
 
     return 0;
 }

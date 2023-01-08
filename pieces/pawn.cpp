@@ -29,6 +29,7 @@ bool Pawn::checkValidMove(Square move, Board* board)
     if (move.x != pos.x) 
     {
         return (abs(pos.x - move.x) == 1 && 
+                move.y - pos.y == diff && 
                 board->squares[move.x][move.y] != nullptr &&
                 board->squares[move.x][move.y]->team == opponent);
     }
