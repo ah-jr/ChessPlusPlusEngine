@@ -12,50 +12,45 @@ King::King(Team team)
 ///=================================================================
 bool King::checkValidMove(Square move, Board* board)
 {
+    if (board->checkIfOutOfBounds(move))
+        return false;
+
+    Square pos = board->checkIfContainsPiece(this);
+    if (pos.x == -1)
+        return false;   
+
+    if (board->squares[move.x][move.y] != nullptr &&
+        board->squares[move.x][move.y]->team == team)
+        return false;
+
+    if (abs(pos.x - move.x) > 1 || abs(pos.y - move.y) > 1)
+        return false;
+    
+    return true;
+}
+
+///=================================================================
+std::vector<Square>* King::getValidMoves(Board* board)
+{
+    std::vector<Square>* moves = new std::vector<Square>();
     Square pos = board->checkIfContainsPiece(this);
 
-    if (pos.x == -1)
-        return false;    
-
-    Team opponent;
-    int start, middle, end, diff;
-
-    if (this->team == Team::WHITE)
-    {
-        opponent = Team::BLACK;
-        start = 1;
-        middle = 2;
-        end = 3;
-        diff = 1;
-    }
-    else
-    {
-        opponent = Team::WHITE;
-        start = 6;
-        middle = 5;
-        end = 4;
-        diff = -1;
+    for(int i = pos.x - 1; i <= pos.x + 1; i++){
+        for(int j = pos.y - 1; j <= pos.y + 1; j++){
+            if (checkValidSquare(Square(i, j))) {
+                if (board->squares[i][j] == nullptr)
+                    moves->push_back(Square(i, j));
+                else if (board->squares[i][j]->team != team)
+                    moves->push_back(Square(i, j)); 
+            }           
+        }
     }
 
-    if (move.x != pos.x) 
-    {
-        return (abs(pos.x - move.x) == 1 && 
-                board->squares[move.x][move.y] != nullptr &&
-                board->squares[move.x][move.y]->team == opponent);
-    }
-    else
-    {
-        if (pos.y == start && 
-            move.y == end && 
-            board->squares[move.x][middle] == nullptr && 
-            board->squares[move.x][end] == nullptr) 
-            return true;
-        else if (move.y - pos.y == diff && 
-                board->squares[move.x][move.y] == nullptr)
-            return true;
-        else    
-            return false;
-    }
+    return moves;        
+}
 
-    return false;
+///=================================================================
+const int King::getValue()
+{
+    return INT_MAX;
 }

@@ -16,14 +16,8 @@ bool Bishop::checkValidMove(Square move, Board* board)
         return false;
 
     Square pos = board->checkIfContainsPiece(this);
-
     if (pos.x == -1)
         return false;   
-
-    Team opponent = this->team == Team::WHITE ? Team::BLACK : Team::WHITE;
-
-    if (pos.x == move.x || pos.y == move.y)
-        return false;
 
     if (board->squares[move.x][move.y] != nullptr &&
         board->squares[move.x][move.y]->team == team)
@@ -32,16 +26,58 @@ bool Bishop::checkValidMove(Square move, Board* board)
     if (abs(move.x - pos.x) != abs(move.y - pos.y))
         return false;
 
-    bool xBigger = move.x < pos.x;
-    bool yBigger = move.y < pos.y;
+    int invX = move.x < pos.x ? -1 : 1; 
+    int invY = move.y < pos.y ? -1 : 1; 
 
-    int sq1 = xBigger ? move.x : pos.x;
-    int sq2 = xBigger ? pos.x : move.x;
-    int inv = xBigger ^ yBigger ? -1 : 1;
-
-    for (int i=sq1+1; i<sq2; i++)
-        if (board->squares[i][pos.y+inv*(i-sq1)] != nullptr)
+    for (int i = 1 ; i<abs(move.x - pos.x); i++)
+        if (board->squares[pos.x + invX*i][pos.y + invY*i] != nullptr)
             return false;
     
     return true;
+}
+
+///=================================================================
+std::vector<Square>* Bishop::getValidMoves(Board* board)
+{
+    auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, int valX, int valY)  
+    {
+        Piece * aux = board->squares[valX][valY];
+
+        if (aux == nullptr){
+            moves->push_back(Square(valX, valY));
+            return false;
+        }
+        else if (aux->team != team){
+            moves->push_back(Square(valX, valY)); 
+            return true;
+        }
+        return true;
+    };
+
+    std::vector<Square>* moves = new std::vector<Square>();
+    Square pos = board->checkIfContainsPiece(this);
+
+    for (int i = 1; i <= std::min(7 - pos.x, 7 - pos.y); i++)
+        if(addSquare(moves, board, team, pos.x + i, pos.y + i))
+            break; 
+            
+    for (int i = 1; i <= std::min(7 - pos.x, pos.y); i++)
+        if(addSquare(moves, board, team, pos.x + i, pos.y - i))
+            break; 
+
+    for (int i = 1; i <= std::min(pos.x, pos.y); i++)
+        if(addSquare(moves, board, team, pos.x - i, pos.y - i))
+            break; 
+
+    for (int i = 1; i <= std::min(pos.x, 7 - pos.y); i++)
+        if(addSquare(moves, board, team, pos.x - i, pos.y + i))
+            break;       
+
+    return moves;
+}
+
+///=================================================================
+const int Bishop::getValue()
+{
+    return 3;
 }

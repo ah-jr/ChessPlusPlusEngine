@@ -1,5 +1,6 @@
 #include <iostream>
 #include "chess_main.h"
+#include "engine.h"
 #include "pieces\base.h"
 #include "pieces\pawn.h"
 #include "pieces\rook.h"
@@ -14,30 +15,123 @@ void printIsValid(Piece* piece, Square move, Board* board)
     std::cout << (piece->checkValidMove(move, board) ? "Valid\n" : "Invalid\n"); 
 }
 
+Board* m_board;
+
 ////////////////////////////////////////////////////////////////////
 /// Main
 ///=================================================================
 int chess_test()
 {
-    Piece* pawn1 = new Pawn(Team::WHITE);
-    Piece* pawn2 = new Pawn(Team::BLACK);
-    Piece* rook1 = new Rook(Team::BLACK);
-    Piece* bishop1 = new Bishop(Team::BLACK);
+    Bishop* bishop1 = new Bishop(Team::BLACK);
+    Rook* rook1 = new Rook(Team::BLACK);
+    Pawn* pawn1 = new Pawn(Team::BLACK);
+    Knight* knight1 = new Knight(Team::BLACK);
 
-    Board* board = new Board();
-    board->squares[1][1] = pawn1;
-    board->squares[6][6] = pawn2;
-    board->squares[5][1] = rook1;
-    board->squares[3][3] = bishop1;
+    Board* m_board = new Board();
+    std::vector<Square>* moves;
 
-    printIsValid(bishop1, Square(2, 2), board);
-    printIsValid(bishop1, Square(1, 1), board);
-    printIsValid(bishop1, Square(5, 5), board);
-    printIsValid(bishop1, Square(6, 6), board);
-    printIsValid(bishop1, Square(4, 2), board);
-    printIsValid(bishop1, Square(5, 1), board);
+    m_board->squares[3][3] = bishop1;
+    m_board->squares[5][5] = pawn1;
+    m_board->squares[3][5] = rook1;
+    m_board->squares[5][4] = knight1;
 
-    delete pawn1, pawn2, rook1, bishop1, board;
+    moves = knight1->getValidMoves(m_board);
 
+    for (auto it = moves->begin(); it != moves->end(); ++it) {
+        std::cout << it->x << ":" << it->y << "\n";
+    }
+
+    delete knight1, rook1, pawn1, bishop1, m_board, moves;
     return 0;
+}
+
+bool play_move(int ox, int oy, int dx, int dy)
+{
+    if (!m_board)
+        return false;
+
+    if (m_board->squares[ox][oy] == nullptr)
+        return false;
+    
+    if (!m_board->squares[ox][oy]->checkValidMove(Square(dx, dy), m_board))
+        return false;
+
+    if (m_board->squares[dx][dy] != nullptr)
+        delete m_board->squares[dx][dy];
+
+    m_board->squares[dx][dy] = m_board->squares[ox][oy];
+    m_board->squares[ox][oy] = nullptr;
+
+    return true; 
+}
+
+bool validate_move(int ox, int oy, int dx, int dy)
+{
+    if (!m_board)
+        return false;
+
+    if (m_board->squares[ox][oy] == nullptr)
+        return false;
+    
+    return m_board->squares[ox][oy]->checkValidMove(Square(dx, dy), m_board);   
+}
+
+bool get_piece(int x, int y, int* team, int* type)
+{
+    Piece* piece = m_board->squares[x][y];
+
+    if (piece)
+    {
+        *team = static_cast<int>(piece->team);
+        *type = static_cast<int>(piece->getType());
+
+        return true;
+    }
+
+    return false;
+}
+
+bool init_game()
+{
+    m_board = new Board();
+
+    // White pieces
+    m_board->squares[0][1] = new Pawn(Team::WHITE);
+    m_board->squares[1][1] = new Pawn(Team::WHITE);
+    m_board->squares[2][1] = new Pawn(Team::WHITE);
+    m_board->squares[3][1] = new Pawn(Team::WHITE);
+    m_board->squares[4][1] = new Pawn(Team::WHITE);
+    m_board->squares[5][1] = new Pawn(Team::WHITE);
+    m_board->squares[6][1] = new Pawn(Team::WHITE);
+    m_board->squares[7][1] = new Pawn(Team::WHITE);
+
+    m_board->squares[0][0] = new Rook  (Team::WHITE);
+    m_board->squares[1][0] = new Knight(Team::WHITE);
+    m_board->squares[2][0] = new Bishop(Team::WHITE);
+    m_board->squares[3][0] = new Queen (Team::WHITE);
+    m_board->squares[4][0] = new King  (Team::WHITE);
+    m_board->squares[5][0] = new Bishop(Team::WHITE);
+    m_board->squares[6][0] = new Knight(Team::WHITE);
+    m_board->squares[7][0] = new Rook  (Team::WHITE);
+
+    // Black pieces
+    m_board->squares[0][6] = new Pawn(Team::BLACK);
+    m_board->squares[1][6] = new Pawn(Team::BLACK);
+    m_board->squares[2][6] = new Pawn(Team::BLACK);
+    m_board->squares[3][6] = new Pawn(Team::BLACK);
+    m_board->squares[4][6] = new Pawn(Team::BLACK);
+    m_board->squares[5][6] = new Pawn(Team::BLACK);
+    m_board->squares[6][6] = new Pawn(Team::BLACK);
+    m_board->squares[7][6] = new Pawn(Team::BLACK);
+
+    m_board->squares[0][7] = new Rook  (Team::BLACK);
+    m_board->squares[1][7] = new Knight(Team::BLACK);
+    m_board->squares[2][7] = new Bishop(Team::BLACK);
+    m_board->squares[3][7] = new Queen (Team::BLACK);
+    m_board->squares[4][7] = new King  (Team::BLACK);
+    m_board->squares[5][7] = new Bishop(Team::BLACK);
+    m_board->squares[6][7] = new Knight(Team::BLACK);
+    m_board->squares[7][7] = new Rook  (Team::BLACK);
+
+    return true;
 }

@@ -1,7 +1,7 @@
 chess_test.exe: chess.dll 
 	g++ -o chess_test chess_test.cpp
 
-chess.dll: base.o pawn.o rook.o knight.o bishop.o queen.o king.o chess_main.o chess_entry.o
+chess.dll: base.o pawn.o rook.o knight.o bishop.o queen.o king.o engine.o chess_main.o chess_entry.o
 	g++ -o chess.dll obj\*.o -mdll
 
 chess_entry.o: chess_entry.cpp
@@ -9,6 +9,9 @@ chess_entry.o: chess_entry.cpp
 
 chess_main.o: chess_main.cpp
 	g++ -c chess_main.cpp -o obj/chess_main.o 
+
+engine.o: engine.cpp
+	g++ -c engine.cpp -o obj/engine.o
 
 king.o: pieces/king.cpp
 	g++ -c pieces/king.cpp -o obj/king.o

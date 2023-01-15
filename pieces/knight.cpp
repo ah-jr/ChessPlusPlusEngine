@@ -12,50 +12,76 @@ Knight::Knight(Team team)
 ///=================================================================
 bool Knight::checkValidMove(Square move, Board* board)
 {
+    if (board->checkIfOutOfBounds(move))
+        return false;
+
     Square pos = board->checkIfContainsPiece(this);
-
     if (pos.x == -1)
-        return false;    
+        return false;   
 
-    Team opponent;
-    int start, middle, end, diff;
+    if (board->squares[move.x][move.y] != nullptr &&
+        board->squares[move.x][move.y]->team == team)
+        return false;
 
-    if (this->team == Team::WHITE)
-    {
-        opponent = Team::BLACK;
-        start = 1;
-        middle = 2;
-        end = 3;
-        diff = 1;
-    }
-    else
-    {
-        opponent = Team::WHITE;
-        start = 6;
-        middle = 5;
-        end = 4;
-        diff = -1;
-    }
-
-    if (move.x != pos.x) 
-    {
-        return (abs(pos.x - move.x) == 1 && 
-                board->squares[move.x][move.y] != nullptr &&
-                board->squares[move.x][move.y]->team == opponent);
-    }
-    else
-    {
-        if (pos.y == start && 
-            move.y == end && 
-            board->squares[move.x][middle] == nullptr && 
-            board->squares[move.x][end] == nullptr) 
-            return true;
-        else if (move.y - pos.y == diff && 
-                board->squares[move.x][move.y] == nullptr)
-            return true;
-        else    
-            return false;
-    }
-
+    if (abs(pos.x - move.x) == 1 && abs(pos.y - move.y) == 2 ||
+        abs(pos.x - move.x) == 2 && abs(pos.y - move.y) == 1)
+        return true;
+    
     return false;
+}
+
+///=================================================================
+std::vector<Square>* Knight::getValidMoves(Board* board)
+{
+    auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, Square aux)  
+    {
+        if (board->squares[aux.x][aux.y] == nullptr)
+            moves->push_back(aux);
+        else if (board->squares[aux.x][aux.y]->team != team)
+            moves->push_back(aux); 
+    };
+
+    std::vector<Square>* moves = new std::vector<Square>();
+    Square pos = board->checkIfContainsPiece(this);
+    Square aux;
+
+    aux = Square(pos.x + 1, pos.y + 2);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);
+
+    aux = Square(pos.x + 1, pos.y - 2);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);  
+
+    aux = Square(pos.x - 1, pos.y + 2);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);
+
+    aux = Square(pos.x - 1, pos.y - 2);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);     
+
+    aux = Square(pos.x + 2, pos.y + 1);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);
+
+    aux = Square(pos.x + 2, pos.y - 1);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);  
+
+    aux = Square(pos.x - 2, pos.y + 1);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);
+
+    aux = Square(pos.x - 2, pos.y - 1);
+    if (checkValidSquare(aux))
+        addSquare(moves, board, team, aux);     
+
+    return moves;
+}
+
+///=================================================================
+const int Knight::getValue()
+{
+    return 3;
 }

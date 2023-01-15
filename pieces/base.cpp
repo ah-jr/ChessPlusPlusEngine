@@ -14,3 +14,9 @@ PieceType Piece::getType()
 {
     return this->type;
 }
+
+///=================================================================
+bool Piece::checkValidSquare(Square square)
+{
+    return square.x >= 0 && square.x <= 7 && square.y >=0 && square.y <= 7;
+}
