@@ -18,8 +18,7 @@ int main()
     return EXIT_FAILURE;
   }
 
-    std::cout << "CHECK1\n";
-  std::cout << funci();
+  funci();
 
   return EXIT_SUCCESS;
 }

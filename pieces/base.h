@@ -55,6 +55,14 @@ typedef struct Square {
 } Square;
 
 ///=================================================================
+typedef struct Move {
+    Move() {}
+    Move(Square o, Square d) : o(o), d(d) {}
+    Square o;
+    Square d; 
+} Move;
+
+///=================================================================
 typedef struct Board { 
     Piece* squares[8][8] = {nullptr};
 

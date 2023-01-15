@@ -1,5 +1,6 @@
 #include "engine.h"
 #include <vector>
+#include <climits>
 
 ////////////////////////////////////////////////////////////////////
 /// Engine
@@ -10,34 +11,71 @@ Engine::Engine(Board* board)
 }
 
 ///=================================================================
-Square Engine::getNextMove(Team team, int depth)
+Move Engine::getNextMove(Board board, Team team, int depth)
 {
-    std::vector<Square>* whitePieces;
-    std::vector<Square>* blackPieces;
+    std::vector<Square>* whitePieces = new std::vector<Square>();
+    std::vector<Square>* blackPieces = new std::vector<Square>();
     std::vector<Square>* selected = team == Team::WHITE ? whitePieces : blackPieces;
+    std::vector<Square>* moves = nullptr;
 
-    for(int i = 0; i < 7; i++){
-        for(int j = 0; j < 7; j++){
-            if (m_board->squares[i][j] != nullptr) {
-                if (m_board->squares[i][j]->team == Team::WHITE)
+    whitePieces->clear();
+    blackPieces->clear();
+
+    for(int i = 0; i <= 7; i++){
+        for(int j = 0; j <= 7; j++){
+            if (board.squares[i][j] != nullptr) {
+                if (board.squares[i][j]->team == Team::WHITE)
                     whitePieces->push_back(Square(i, j));    
-                if (m_board->squares[i][j]->team == Team::BLACK)
+                if (board.squares[i][j]->team == Team::BLACK)
                     blackPieces->push_back(Square(i, j));                  
             }
         }
     }
 
+    Square origin = Square(-1, -1);
+    Square dest = Square(-1, -1);
+    int evaluation = INT_MIN;
+    int cur_eval;
+//    bool set = false;
+
     for (auto it_p = selected->begin(); it_p != selected->end(); ++it_p) {
-        Piece* piece = m_board->squares[it_p->x][it_p->y];
-        std::vector<Square>* moves = piece->getValidMoves(m_board);
-        int evaluation = 0;
+        Piece* piece = board.squares[it_p->x][it_p->y];
+        moves = piece->getValidMoves(&board);
 
         for (auto it_m = moves->begin(); it_m != moves->end(); ++it_m) {
-            Piece* piece = m_board->squares[it_m->x][it_m->y];
-            if (piece != nullptr)
-                evaluation += piece->getValue();
+            // if (!set){
+            //     origin = Square(it_p->x, it_p->y);
+            //     dest   = Square(it_m->x, it_m->y);                
+            //     set    = true;
+            // }
+
+            Piece* piece = board.squares[it_m->x][it_m->y];
+
+            if (depth == 1){
+                if (piece != nullptr)
+                    cur_eval = piece->getValue();
+                else
+                    cur_eval = 0;
+
+                if (cur_eval > evaluation){
+                    origin = Square(it_p->x, it_p->y);
+                    dest   = Square(it_m->x, it_m->y);
+                    evaluation = cur_eval;
+                }                
+            }
+
+
+            // if (piece != nullptr){
+            //     if (piece->getValue() > evaluation){
+            //         origin = Square(it_p->x, it_p->y);
+            //         dest   = Square(it_m->x, it_m->y);
+            //         evaluation = piece->getValue();
+            //     }
+            // }
         }
     }
-    
-    delete whitePieces, blackPieces;              
+    delete whitePieces, blackPieces;
+    if (moves) delete moves;
+
+    return Move(origin, dest);
 }

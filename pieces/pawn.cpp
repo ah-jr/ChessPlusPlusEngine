@@ -62,12 +62,14 @@ std::vector<Square>* Pawn::getValidMoves(Board* board)
 
     aux = Square(pos.x - 1, pos.y + diff);
     if (checkValidSquare(aux))
-        if (board->squares[aux.x][aux.y]->team != team)
+        if (board->squares[aux.x][aux.y] != nullptr &&
+            board->squares[aux.x][aux.y]->team != team)
             moves->push_back(aux);  
 
     aux = Square(pos.x + 1, pos.y + diff);
     if (checkValidSquare(aux))
-        if (board->squares[aux.x][aux.y]->team != team)
+        if (board->squares[aux.x][aux.y] != nullptr &&
+            board->squares[aux.x][aux.y]->team != team)
             moves->push_back(aux);   
 
     aux = Square(pos.x, pos.y + diff);

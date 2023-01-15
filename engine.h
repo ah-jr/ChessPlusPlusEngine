@@ -1,7 +1,7 @@
 #ifndef ENGINE_HEADER
 #define ENGINE_HEADER
 
-#include "base.h"
+#include "pieces\base.h"
 
 ////////////////////////////////////////////////////////////////////
 /// Engine
@@ -14,7 +14,7 @@ class Engine
     public:
         Engine(Board* board); 
 
-        Square getNextMove(Team team, int depth);
+        Move getNextMove(Board board, Team team, int depth);
 };
 
 #endif

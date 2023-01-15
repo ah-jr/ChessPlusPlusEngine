@@ -16,32 +16,19 @@ void printIsValid(Piece* piece, Square move, Board* board)
 }
 
 Board* m_board;
+Engine* m_engine;
+
 
 ////////////////////////////////////////////////////////////////////
 /// Main
 ///=================================================================
 int chess_test()
 {
-    Bishop* bishop1 = new Bishop(Team::BLACK);
-    Rook* rook1 = new Rook(Team::BLACK);
-    Pawn* pawn1 = new Pawn(Team::BLACK);
-    Knight* knight1 = new Knight(Team::BLACK);
+    init_game();
+    Move move = m_engine->getNextMove(*m_board, Team::WHITE, 4);
 
-    Board* m_board = new Board();
-    std::vector<Square>* moves;
+    std::cout << move.o.x << ":" << move.o.y << " -> "  << move.d.x << ":"  << move.d.y;
 
-    m_board->squares[3][3] = bishop1;
-    m_board->squares[5][5] = pawn1;
-    m_board->squares[3][5] = rook1;
-    m_board->squares[5][4] = knight1;
-
-    moves = knight1->getValidMoves(m_board);
-
-    for (auto it = moves->begin(); it != moves->end(); ++it) {
-        std::cout << it->x << ":" << it->y << "\n";
-    }
-
-    delete knight1, rook1, pawn1, bishop1, m_board, moves;
     return 0;
 }
 
@@ -94,6 +81,7 @@ bool get_piece(int x, int y, int* team, int* type)
 bool init_game()
 {
     m_board = new Board();
+    m_engine = new Engine(m_board);
 
     // White pieces
     m_board->squares[0][1] = new Pawn(Team::WHITE);
@@ -134,4 +122,14 @@ bool init_game()
     m_board->squares[7][7] = new Rook  (Team::BLACK);
 
     return true;
+}
+
+void get_next_move(int* ox, int* oy, int* dx, int* dy)
+{
+    Move move = m_engine->getNextMove(*m_board, Team::WHITE, 1);
+
+    *ox = move.o.x;
+    *oy = move.o.y;
+    *dx = move.d.x;
+    *dy = move.d.y;
 }
