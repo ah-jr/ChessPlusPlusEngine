@@ -23,9 +23,39 @@ bool King::checkValidMove(Square move, Board* board)
         board->squares[move.x][move.y]->team == team)
         return false;
 
+    if (team == Team::WHITE){
+        if (board->whiteCastleL &&
+            board->squares[1][0] == nullptr &&
+            board->squares[2][0] == nullptr &&
+            board->squares[3][0] == nullptr && 
+            move.x == 2 && move.y == 0)
+            return true;
+        
+        if (board->whiteCastleR &&
+            board->squares[5][0] == nullptr &&
+            board->squares[6][0] == nullptr &&
+            move.x == 6 && move.y == 0)
+            return true;
+    }
+
+    if (team == Team::BLACK){
+        if (board->blackCastleL &&
+            board->squares[1][7] == nullptr &&
+            board->squares[2][7] == nullptr &&
+            board->squares[3][7] == nullptr && 
+            move.x == 2 && move.y == 7)
+            return true;
+        
+        if (board->blackCastleR &&
+            board->squares[5][7] == nullptr &&
+            board->squares[6][7] == nullptr &&
+            move.x == 6 && move.y == 7)
+            return true;
+    }
+
     if (abs(pos.x - move.x) > 1 || abs(pos.y - move.y) > 1)
         return false;
-    
+
     return true;
 }
 
@@ -52,5 +82,5 @@ std::vector<Square>* King::getValidMoves(Board* board)
 ///=================================================================
 const int King::getValue()
 {
-    return INT_MAX;
+    return 100;
 }

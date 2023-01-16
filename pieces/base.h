@@ -46,6 +46,8 @@ constexpr const char* TeamToString(Team e)
     }
 }
 
+Team GetOppositeTeam(Team team);
+
 ///=================================================================
 typedef struct Square {
     Square() {}
@@ -65,6 +67,11 @@ typedef struct Move {
 ///=================================================================
 typedef struct Board { 
     Piece* squares[8][8] = {nullptr};
+
+    bool blackCastleL = true;
+    bool blackCastleR = true;
+    bool whiteCastleL = true;
+    bool whiteCastleR = true;
 
     Square checkIfContainsPiece(Piece* piece){
         for (int i=0; i<8; i++)

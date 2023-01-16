@@ -49,6 +49,51 @@ bool play_move(int ox, int oy, int dx, int dy)
     m_board->squares[dx][dy] = m_board->squares[ox][oy];
     m_board->squares[ox][oy] = nullptr;
 
+    // Castles
+    if (m_board->squares[dx][dy]->getType() == PieceType::ROOK){
+        if (m_board->squares[dx][dy]->team == Team::WHITE){
+            if (ox == 0 && oy == 0)
+                m_board->whiteCastleL = false;
+            else if (ox == 7 && oy == 0)
+                m_board->whiteCastleR = false;
+        }
+        else{
+            if (ox == 0 && oy == 7)
+                m_board->blackCastleL = false;
+            else if (ox == 7 && oy == 7)
+                m_board->blackCastleR = false;
+        }
+    }
+
+    if (m_board->squares[dx][dy]->getType() == PieceType::KING){
+        if (m_board->squares[dx][dy]->team == Team::WHITE){
+            m_board->whiteCastleL = false; 
+            m_board->whiteCastleR = false;
+
+            if (ox > dx + 1){
+                m_board->squares[3][0] = m_board->squares[0][0];
+                m_board->squares[0][0] = nullptr;
+            }
+            else if (ox + 1 < dx){
+                m_board->squares[5][0] = m_board->squares[7][0];
+                m_board->squares[7][0] = nullptr; 
+            }           
+        }
+        else {
+            m_board->blackCastleL = false; 
+            m_board->blackCastleR = false;        
+
+            if (ox > dx + 1){
+                m_board->squares[3][7] = m_board->squares[0][7];
+                m_board->squares[0][7] = nullptr;
+            }
+            else if (ox + 1 < dx){
+                m_board->squares[5][7] = m_board->squares[7][7];
+                m_board->squares[7][7] = nullptr;
+            }        
+        }
+    }
+
     return true; 
 }
 
@@ -124,9 +169,9 @@ bool init_game()
     return true;
 }
 
-void get_next_move(int* ox, int* oy, int* dx, int* dy)
+void get_next_move(int team, int* ox, int* oy, int* dx, int* dy)
 {
-    Move move = m_engine->getNextMove(*m_board, Team::WHITE, 1);
+    Move move = m_engine->getNextMove(*m_board, static_cast<Team>(team), 4);
 
     *ox = move.o.x;
     *oy = move.o.y;
