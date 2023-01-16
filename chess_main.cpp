@@ -25,7 +25,7 @@ Engine* m_engine;
 int chess_test()
 {
     init_game();
-    Move move = m_engine->getNextMove(*m_board, Team::WHITE, 4);
+    Move move = m_engine->getNextMove(m_board, Team::WHITE, 4);
 
     std::cout << move.o.x << ":" << move.o.y << " -> "  << move.d.x << ":"  << move.d.y;
 
@@ -171,7 +171,7 @@ bool init_game()
 
 void get_next_move(int team, int* ox, int* oy, int* dx, int* dy)
 {
-    Move move = m_engine->getNextMove(*m_board, static_cast<Team>(team), 4);
+    Move move = m_engine->getNextMove(m_board, static_cast<Team>(team), 6);
 
     *ox = move.o.x;
     *oy = move.o.y;

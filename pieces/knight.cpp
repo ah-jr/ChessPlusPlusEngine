@@ -31,7 +31,7 @@ bool Knight::checkValidMove(Square move, Board* board)
 }
 
 ///=================================================================
-std::vector<Square>* Knight::getValidMoves(Board* board)
+std::vector<Square>* Knight::getValidMoves(Board* board, Square pos)
 {
     auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, Square aux)  
     {
@@ -42,7 +42,6 @@ std::vector<Square>* Knight::getValidMoves(Board* board)
     };
 
     std::vector<Square>* moves = new std::vector<Square>();
-    Square pos = board->checkIfContainsPiece(this);
     Square aux;
 
     aux = Square(pos.x + 1, pos.y + 2);

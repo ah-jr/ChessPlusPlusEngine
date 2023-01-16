@@ -51,10 +51,9 @@ bool Pawn::checkValidMove(Square move, Board* board)
 }
 
 ///=================================================================
-std::vector<Square>* Pawn::getValidMoves(Board* board)
+std::vector<Square>* Pawn::getValidMoves(Board* board, Square pos)
 {
     std::vector<Square>* moves = new std::vector<Square>();
-    Square pos = board->checkIfContainsPiece(this);
     Square aux;
 
     int diff     = (team == Team::WHITE) ? 1 : -1;
@@ -80,7 +79,8 @@ std::vector<Square>* Pawn::getValidMoves(Board* board)
 
     aux = Square(pos.x, pos.y + 2*diff);
     if (checkValidSquare(aux)){
-        if (board->squares[aux.x][aux.y] == nullptr && pos.y == startPos)
+        if (board->squares[aux.x][pos.y + 1*diff] == nullptr &&
+            board->squares[aux.x][pos.y + 2*diff] == nullptr && pos.y == startPos)
             moves->push_back(aux);   
     } 
 

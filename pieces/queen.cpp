@@ -57,7 +57,7 @@ bool Queen::checkValidMove(Square move, Board* board)
 }
 
 ///=================================================================
-std::vector<Square>* Queen::getValidMoves(Board* board)
+std::vector<Square>* Queen::getValidMoves(Board* board, Square pos)
 {
     auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, int valX, int valY)  
     {
@@ -75,7 +75,6 @@ std::vector<Square>* Queen::getValidMoves(Board* board)
     };
 
     std::vector<Square>* moves = new std::vector<Square>();
-    Square pos = board->checkIfContainsPiece(this);
 
     for (int i = 1; i <= std::min(7 - pos.x, 7 - pos.y); i++)
         if(addSquare(moves, board, team, pos.x + i, pos.y + i))

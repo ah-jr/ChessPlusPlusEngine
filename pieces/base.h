@@ -103,7 +103,7 @@ class Piece
         Piece(Team team, PieceType type); 
         virtual const int getValue() = 0;
         virtual bool checkValidMove(Square move, Board* board) = 0;
-        virtual std::vector<Square>* getValidMoves(Board* board) = 0;
+        virtual std::vector<Square>* getValidMoves(Board* board, Square pos) = 0;
         PieceType getType();
 };
 

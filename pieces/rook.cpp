@@ -44,7 +44,7 @@ bool Rook::checkValidMove(Square move, Board* board)
 }
 
 ///=================================================================
-std::vector<Square>* Rook::getValidMoves(Board* board)
+std::vector<Square>* Rook::getValidMoves(Board* board, Square pos)
 {
     auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, int valX, int valY)  
     {
@@ -62,7 +62,6 @@ std::vector<Square>* Rook::getValidMoves(Board* board)
     };
 
     std::vector<Square>* moves = new std::vector<Square>();
-    Square pos = board->checkIfContainsPiece(this);
 
     for (int i = 1; i <= 7 - pos.x; i++)
         if(addSquare(moves, board, team, pos.x + i, pos.y))

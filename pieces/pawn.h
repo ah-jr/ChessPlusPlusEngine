@@ -13,7 +13,7 @@ class Pawn : public Piece
         Pawn(Team team); 
         const int getValue();
         bool checkValidMove(Square move, Board* board);
-        std::vector<Square>* getValidMoves(Board* board);
+        std::vector<Square>* getValidMoves(Board* board, Square pos);
 };
 
 #endif

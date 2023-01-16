@@ -60,10 +60,9 @@ bool King::checkValidMove(Square move, Board* board)
 }
 
 ///=================================================================
-std::vector<Square>* King::getValidMoves(Board* board)
+std::vector<Square>* King::getValidMoves(Board* board, Square pos)
 {
     std::vector<Square>* moves = new std::vector<Square>();
-    Square pos = board->checkIfContainsPiece(this);
 
     for(int i = pos.x - 1; i <= pos.x + 1; i++){
         for(int j = pos.y - 1; j <= pos.y + 1; j++){
