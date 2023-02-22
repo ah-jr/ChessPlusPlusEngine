@@ -54,7 +54,13 @@ typedef struct Square {
     Square(int x, int y) : x(x), y(y) {}
     int x;
     int y; 
+
+    friend bool operator==(const Square& l, const Square& r){
+        return (l.x == r.x && l.y == r.y);
+    }
 } Square;
+
+typedef std::vector<Square>* SquareVec;
 
 ///=================================================================
 typedef struct Move {

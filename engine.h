@@ -15,7 +15,7 @@ class Engine
         Engine(Board* board); 
 
         Move getNextMove(Board* board, Team team, int depth);
-        int  getNextMoveR(const Move& move, Board* board, Team team, int depth);
+        int  getNextMoveR(const Move& move, Board* board, SquareVec wPieces, SquareVec bPieces, Team team, int depth);
 };
 
 #endif
