@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include <windows.h>
 #include <iostream>
 
@@ -5,7 +7,7 @@ typedef int (__stdcall *f_funci)();
 
 int main()
 {
-  HINSTANCE hGetProcIDDLL = LoadLibrary("C:\\Projects\\Chess\\chess.dll");
+  HINSTANCE hGetProcIDDLL = LoadLibrary(L"ChessPlusPlusEngine.dll");
 
   if (!hGetProcIDDLL) {
     std::cout << "could not load the dynamic library" << std::endl;

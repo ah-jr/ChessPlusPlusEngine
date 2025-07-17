@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source\src">
+      <UniqueIdentifier>{4aeb4838-a8be-4c7a-bc1d-cffc0d2390f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\src\engine">
+      <UniqueIdentifier>{91a801ac-02a8-48f9-ae83-e8bc72d09aab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\src\pieces">
+      <UniqueIdentifier>{4c887dec-7942-4c61-87a5-5ebeb751aaf8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chess_main.h">
+      <Filter>Source\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\knight.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\pawn.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\queen.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\rook.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\base.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\bishop.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces\king.h">
+      <Filter>Source\src\pieces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\engine.h">
+      <Filter>Source\src\engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chess_main.cpp">
+      <Filter>Source\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chess_test.cpp">
+      <Filter>Source\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\knight.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\pawn.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\queen.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\rook.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\base.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\bishop.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces\king.cpp">
+      <Filter>Source\src\pieces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\engine.cpp">
+      <Filter>Source\src\engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

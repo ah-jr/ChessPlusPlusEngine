@@ -1,16 +1,18 @@
-#include "rook.h"
+#include "pch.h"
+
+#include "bishop.h"
 #include <algorithm>
 
 ////////////////////////////////////////////////////////////////////
-/// Rook
+/// Bishop
 ///=================================================================
-Rook::Rook(Team team) 
-    : Piece(team, PieceType::ROOK)
+Bishop::Bishop(Team team) 
+    : Piece(team, PieceType::BISHOP)
 {
 }
 
 ///=================================================================
-bool Rook::checkValidMove(Square move, Board* board)
+bool Bishop::checkValidMove(Square move, Board* board)
 {
     if (board->checkIfOutOfBounds(move))
         return false;
@@ -23,28 +25,21 @@ bool Rook::checkValidMove(Square move, Board* board)
         board->squares[move.x][move.y]->team == team)
         return false;
 
-    if (pos.x != move.x && pos.y != move.y)
+    if (abs(move.x - pos.x) != abs(move.y - pos.y))
         return false;
 
-    bool vert = pos.x == move.x;
-    int  dist = vert ? abs(move.y - pos.y) : abs(move.x - pos.x);
-    int  invX = move.x < pos.x ? -1 : 1; 
-    int  invY = move.y < pos.y ? -1 : 1; 
+    int invX = move.x < pos.x ? -1 : 1; 
+    int invY = move.y < pos.y ? -1 : 1; 
 
-    for (int i = 1; i < dist; i++)
-    {
-        int X = pos.x + (vert ? 0 : invX*i);
-        int Y = pos.y + (vert ? invY*i : 0); 
-
-        if (board->squares[X][Y] != nullptr)
-            return false;   
-    }
+    for (int i = 1 ; i<abs(move.x - pos.x); i++)
+        if (board->squares[pos.x + invX*i][pos.y + invY*i] != nullptr)
+            return false;
     
     return true;
 }
 
 ///=================================================================
-std::vector<Square>* Rook::getValidMoves(Board* board, Square pos)
+std::vector<Square>* Bishop::getValidMoves(Board* board, Square pos)
 {
     auto addSquare = [](std::vector<Square>* moves, Board* board, Team team, int valX, int valY)  
     {
@@ -63,27 +58,27 @@ std::vector<Square>* Rook::getValidMoves(Board* board, Square pos)
 
     std::vector<Square>* moves = new std::vector<Square>();
 
-    for (int i = 1; i <= 7 - pos.x; i++)
-        if(addSquare(moves, board, team, pos.x + i, pos.y))
+    for (int i = 1; i <= std::min(7 - pos.x, 7 - pos.y); i++)
+        if(addSquare(moves, board, team, pos.x + i, pos.y + i))
             break; 
             
-    for (int i = 1; i <= pos.x; i++)
-        if(addSquare(moves, board, team, pos.x - i, pos.y))
+    for (int i = 1; i <= std::min(7 - pos.x, pos.y); i++)
+        if(addSquare(moves, board, team, pos.x + i, pos.y - i))
             break; 
 
-    for (int i = 1; i <= 7 - pos.y; i++)
-        if(addSquare(moves, board, team, pos.x, pos.y + i))
+    for (int i = 1; i <= std::min(pos.x, pos.y); i++)
+        if(addSquare(moves, board, team, pos.x - i, pos.y - i))
             break; 
 
-    for (int i = 1; i <= pos.y; i++)
-        if(addSquare(moves, board, team, pos.x, pos.y - i))
+    for (int i = 1; i <= std::min(pos.x, 7 - pos.y); i++)
+        if(addSquare(moves, board, team, pos.x - i, pos.y + i))
             break;       
 
     return moves;
 }
 
 ///=================================================================
-const int Rook::getValue()
+const int Bishop::getValue()
 {
-    return 5;
+    return 3;
 }

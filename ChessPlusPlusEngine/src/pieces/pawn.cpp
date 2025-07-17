@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "pawn.h"
 #include <algorithm>
 

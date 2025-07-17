@@ -1,7 +1,7 @@
 #ifndef ENGINE_HEADER
 #define ENGINE_HEADER
 
-#include "pieces\base.h"
+#include "..\pieces\base.h"
 
 ////////////////////////////////////////////////////////////////////
 /// Engine

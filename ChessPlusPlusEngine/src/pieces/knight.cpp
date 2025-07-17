@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "knight.h"
 #include <algorithm>
 
