@@ -49,7 +49,8 @@ bool play_move(int ox, int oy, int dx, int dy)
     m_board->squares[dx][dy] = m_board->squares[ox][oy];
     m_board->squares[ox][oy] = nullptr;
 
-    // Castles
+    // Castling logic
+    // If rook is moved, disable castle rights
     if (m_board->squares[dx][dy]->getType() == PieceType::ROOK){
         if (m_board->squares[dx][dy]->team == Team::WHITE){
             if (ox == 0 && oy == 0)
@@ -65,6 +66,8 @@ bool play_move(int ox, int oy, int dx, int dy)
         }
     }
 
+    // If king is moved, disable castle rights
+    // Castles if intended
     if (m_board->squares[dx][dy]->getType() == PieceType::KING){
         if (m_board->squares[dx][dy]->team == Team::WHITE){
             m_board->whiteCastleL = false; 
@@ -91,6 +94,20 @@ bool play_move(int ox, int oy, int dx, int dy)
                 m_board->squares[5][7] = m_board->squares[7][7];
                 m_board->squares[7][7] = nullptr;
             }        
+        }
+    }
+
+    // Promotion logic (currently only queen supported)
+    if (m_board->squares[dx][dy]->getType() == PieceType::PAWN){
+        if (m_board->squares[dx][dy]->team == Team::WHITE && dy == 7){
+            delete m_board->squares[dx][dy];
+            m_board->squares[dx][dy] = nullptr;
+            m_board->squares[dx][dy] = new Queen (Team::WHITE);
+        }
+        else if (m_board->squares[dx][dy]->team == Team::BLACK && dy == 0){
+            delete m_board->squares[dx][dy];
+            m_board->squares[dx][dy] = nullptr;
+            m_board->squares[dx][dy] = new Queen (Team::BLACK);
         }
     }
 

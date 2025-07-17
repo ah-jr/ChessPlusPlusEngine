@@ -28,12 +28,18 @@ bool King::checkValidMove(Square move, Board* board)
             board->squares[1][0] == nullptr &&
             board->squares[2][0] == nullptr &&
             board->squares[3][0] == nullptr && 
+            !board->countAttacks(Square(2, 0), team) && 
+            !board->countAttacks(Square(3, 0), team) &&
+            !board->countAttacks(Square(4, 0), team) &&
             move.x == 2 && move.y == 0)
             return true;
         
         if (board->whiteCastleR &&
             board->squares[5][0] == nullptr &&
             board->squares[6][0] == nullptr &&
+            !board->countAttacks(Square(4, 0), team) && 
+            !board->countAttacks(Square(5, 0), team) &&
+            !board->countAttacks(Square(6, 0), team) &&
             move.x == 6 && move.y == 0)
             return true;
     }
@@ -43,12 +49,18 @@ bool King::checkValidMove(Square move, Board* board)
             board->squares[1][7] == nullptr &&
             board->squares[2][7] == nullptr &&
             board->squares[3][7] == nullptr && 
+            !board->countAttacks(Square(2, 7), team) && 
+            !board->countAttacks(Square(3, 7), team) &&
+            !board->countAttacks(Square(4, 7), team) &&
             move.x == 2 && move.y == 7)
             return true;
         
         if (board->blackCastleR &&
             board->squares[5][7] == nullptr &&
             board->squares[6][7] == nullptr &&
+            !board->countAttacks(Square(4, 7), team) && 
+            !board->countAttacks(Square(5, 7), team) &&
+            !board->countAttacks(Square(6, 7), team) &&
             move.x == 6 && move.y == 7)
             return true;
     }

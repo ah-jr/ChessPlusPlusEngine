@@ -7,6 +7,7 @@
 /// Generic Types
 ///=================================================================
 class Piece;
+class Board;
 
 ///=================================================================
 enum class PieceType { 
@@ -70,26 +71,22 @@ typedef struct Move {
     Square d; 
 } Move;
 
+////////////////////////////////////////////////////////////////////
+/// Board
 ///=================================================================
 typedef struct Board { 
-    Piece* squares[8][8] = {nullptr};
+    public:
+        Piece* squares[8][8] = {nullptr};
 
-    bool blackCastleL = true;
-    bool blackCastleR = true;
-    bool whiteCastleL = true;
-    bool whiteCastleR = true;
+        bool blackCastleL = true;
+        bool blackCastleR = true;
+        bool whiteCastleL = true;
+        bool whiteCastleR = true;
 
-    Square checkIfContainsPiece(Piece* piece){
-        for (int i=0; i<8; i++)
-            for (int j=0; j<8; j++)
-                if (squares[i][j] == piece)
-                    return Square(i, j);
-        return Square(-1, -1);
-    }
-
-    bool checkIfOutOfBounds(Square square){
-        return (square.x < 0 || square.x > 7 || square.y < 0 || square.y > 7);
-    }
+        Piece* getPiece(Square square);
+        Square checkIfContainsPiece(Piece* piece);
+        bool checkIfOutOfBounds(Square square);
+        int countAttacks(Square square, Team team);
 } Board;
 
 ////////////////////////////////////////////////////////////////////
