@@ -26,9 +26,6 @@
     <ClInclude Include="framework.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="src\chess_main.h">
-      <Filter>Source\src</Filter>
-    </ClInclude>
     <ClInclude Include="src\pieces\knight.h">
       <Filter>Source\src\pieces</Filter>
     </ClInclude>
@@ -53,6 +50,9 @@
     <ClInclude Include="src\engine\engine.h">
       <Filter>Source\src\engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\ChessPlusPlusEngine.h">
+      <Filter>Source\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -61,10 +61,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="src\chess_main.cpp">
-      <Filter>Source\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\chess_test.cpp">
+    <ClCompile Include="src\ChessPlusPlusEngine.cpp">
       <Filter>Source\src</Filter>
     </ClCompile>
     <ClCompile Include="src\pieces\knight.cpp">

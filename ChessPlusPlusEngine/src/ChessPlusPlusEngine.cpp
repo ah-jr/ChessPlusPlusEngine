@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include <iostream>
-#include "chess_main.h"
+#include "ChessPlusPlusEngine.h"
 #include "engine\engine.h"
 #include "pieces\base.h"
 #include "pieces\pawn.h"
@@ -20,20 +20,7 @@ void printIsValid(Piece* piece, Square move, Board* board)
 Board* m_board;
 Engine* m_engine;
 
-
-////////////////////////////////////////////////////////////////////
-/// Main
 ///=================================================================
-int chess_test()
-{
-    init_game();
-    Move move = m_engine->getNextMove(m_board, Team::WHITE, 4);
-
-    std::cout << move.o.x << ":" << move.o.y << " -> "  << move.d.x << ":"  << move.d.y;
-
-    return 0;
-}
-
 bool play_move(int ox, int oy, int dx, int dy)
 {
     if (!m_board)
@@ -118,6 +105,9 @@ bool play_move(int ox, int oy, int dx, int dy)
 
 bool validate_move(int ox, int oy, int dx, int dy)
 {
+    if (m_board->checkIfOutOfBounds(Square(ox, oy)) || m_board->checkIfOutOfBounds(Square(dx, dy)))
+        return false;
+
     if (!m_board)
         return false;
 

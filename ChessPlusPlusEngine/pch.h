@@ -1,7 +1,7 @@
 #ifndef PCH_H
 #define PCH_H
 
-
+#define CHESS_ENGINE_EXPORTS
 #define NOMINMAX
 
 #include "framework.h"
