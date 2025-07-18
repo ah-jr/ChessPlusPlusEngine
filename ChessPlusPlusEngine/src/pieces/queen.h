@@ -1,19 +1,21 @@
 #ifndef QUEEN_HEADER
 #define QUEEN_HEADER
 
-#include "base.h"
-#include <vector>
+#include "../basic.h"
 
 ////////////////////////////////////////////////////////////////////
 /// Queen
 ///=================================================================
 class Queen : public Piece
 {
-    public:
-        Queen(Team team); 
-        const int getValue();
-        bool checkValidMove(Square move, Board* board);
-        std::vector<Square>* getValidMoves(Board* board, Square pos);
+public:
+    Queen(Player team); 
+
+    int getValue() const;
+    MoveInfo getMoveInfo(const Move& move) const;
+    MoveInfoVec getAllMovesInfo(const Square& origin) const;
+
+    DECLARE_CLONABLE(Queen);
 };
 
 #endif

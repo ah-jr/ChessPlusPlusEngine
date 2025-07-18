@@ -1,96 +1,67 @@
 #include "pch.h"
 
 #include "pawn.h"
-#include <algorithm>
 
 ////////////////////////////////////////////////////////////////////
 /// Pawn
 ///=================================================================
-Pawn::Pawn(Team team) 
+Pawn::Pawn(Player team) 
     : Piece(team, PieceType::PAWN)
 {
 }
 
 ///=================================================================
-bool Pawn::checkValidMove(Square move, Board* board)
-{
-    if (board->checkIfOutOfBounds(move))
-        return false;
-
-    Square pos = board->checkIfContainsPiece(this);
-
-    if (pos.x == -1)
-        return false;    
-
-    Team opponent = this->team == Team::WHITE ? Team::BLACK : Team::WHITE;
-    int start     = this->team == Team::WHITE ? 1 : 6;
-    int middle    = this->team == Team::WHITE ? 2 : 5;    
-    int end       = this->team == Team::WHITE ? 3 : 4;
-    int diff      = this->team == Team::WHITE ? 1 : -1;
-
-    if (move.x != pos.x) 
-    {
-        return (abs(pos.x - move.x) == 1 && 
-                move.y - pos.y == diff && 
-                board->squares[move.x][move.y] != nullptr &&
-                board->squares[move.x][move.y]->team == opponent);
-    }
-    else
-    {
-        if (pos.y == start && 
-            move.y == end && 
-            board->squares[move.x][middle] == nullptr && 
-            board->squares[move.x][end] == nullptr) 
-            return true;
-        else if (move.y - pos.y == diff && 
-                board->squares[move.x][move.y] == nullptr)
-            return true;
-        else    
-            return false;
-    }
-
-    return false;
-}
-
-///=================================================================
-std::vector<Square>* Pawn::getValidMoves(Board* board, Square pos)
-{
-    std::vector<Square>* moves = new std::vector<Square>();
-    Square aux;
-
-    int diff     = (team == Team::WHITE) ? 1 : -1;
-    int startPos = (team == Team::WHITE) ? 1 : 6;
-
-    aux = Square(pos.x - 1, pos.y + diff);
-    if (checkValidSquare(aux))
-        if (board->squares[aux.x][aux.y] != nullptr &&
-            board->squares[aux.x][aux.y]->team != team)
-            moves->push_back(aux);  
-
-    aux = Square(pos.x + 1, pos.y + diff);
-    if (checkValidSquare(aux))
-        if (board->squares[aux.x][aux.y] != nullptr &&
-            board->squares[aux.x][aux.y]->team != team)
-            moves->push_back(aux);   
-
-    aux = Square(pos.x, pos.y + diff);
-    if (checkValidSquare(aux)){
-        if (board->squares[aux.x][aux.y] == nullptr)
-            moves->push_back(aux);   
-    } 
-
-    aux = Square(pos.x, pos.y + 2*diff);
-    if (checkValidSquare(aux)){
-        if (board->squares[aux.x][pos.y + 1*diff] == nullptr &&
-            board->squares[aux.x][pos.y + 2*diff] == nullptr && pos.y == startPos)
-            moves->push_back(aux);   
-    } 
-
-    return moves;
-}
-
-///=================================================================
-const int Pawn::getValue()
+int Pawn::getValue() const
 {
     return 1;
+}
+
+///=================================================================
+MoveInfo Pawn::getMoveInfo(const Move& move) const
+{
+    MoveInfo result;
+    result.type = MoveType::IMPOSSIBLE;
+
+    if (!move.isValid())
+        return result;
+
+    const Square& o = move.getOrigin();
+    const Square& d = move.getDestination();
+
+    int multiplier = (team == Player::WHITE ? 1 : -1);
+    int startRank = (team == Player::WHITE ? 1 : 6);
+    int promotionRank = (team == Player::WHITE ? 7 : 0);
+
+    int xDiff = std::abs(o.getX() - d.getX());
+    int yDiff = (d.getY() - o.getY()) * multiplier;
+
+    if (xDiff <= 1 && yDiff == 1)
+    {
+        result.type = (d.getY() == promotionRank) ? MoveType::PAWN_CAPTURE_PROMOTION : MoveType::PAWN_CAPTURE;
+        result.path.push_back(d);
+    }
+
+    if (xDiff == 0)
+    {
+        if (yDiff == 1)
+        {
+            result.type = (d.getY() == promotionRank) ? MoveType::PAWN_PROMOTION : MoveType::PAWN_MOVE;
+            result.path.push_back(d);
+        }
+
+        if (yDiff == 2 && o.getY() == startRank)
+        {
+            result.type = MoveType::PAWN_DOUBLE_MOVE;
+            result.path.push_back(Square(o.getX(), o.getY() + multiplier));
+            result.path.push_back(d);
+        }
+    }
+
+    return result;
+}
+
+///=================================================================
+MoveInfoVec Pawn::getAllMovesInfo(const Square& origin) const
+{
+    return {};
 }

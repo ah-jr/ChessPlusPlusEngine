@@ -1,19 +1,21 @@
 #ifndef ROOK_HEADER
 #define ROOK_HEADER
 
-#include "base.h"
-#include <vector>
+#include "../basic.h"
 
 ////////////////////////////////////////////////////////////////////
 /// Rook
 ///=================================================================
 class Rook : public Piece
 {
-    public:
-        Rook(Team team); 
-        const int getValue();
-        bool checkValidMove(Square move, Board* board);
-        std::vector<Square>* getValidMoves(Board* board, Square pos);
+public:
+    Rook(Player team); 
+
+    int getValue() const;
+    MoveInfo getMoveInfo(const Move& move) const;
+    MoveInfoVec getAllMovesInfo(const Square& origin) const;
+
+    DECLARE_CLONABLE(Rook);
 };
 
 #endif

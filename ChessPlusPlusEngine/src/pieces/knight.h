@@ -1,19 +1,21 @@
 #ifndef KNIGHT_HEADER
 #define KNIGHT_HEADER
 
-#include "base.h"
-#include <vector>
+#include "../basic.h"
 
 ////////////////////////////////////////////////////////////////////
 /// Knight
 ///=================================================================
 class Knight : public Piece
 {
-    public:
-        Knight(Team team); 
-        const int getValue();
-        bool checkValidMove(Square move, Board* board);
-        std::vector<Square>* getValidMoves(Board* board, Square pos);
+public:
+    Knight(Player team); 
+
+    int getValue() const;
+    MoveInfo getMoveInfo(const Move& move) const;
+    MoveInfoVec getAllMovesInfo(const Square& origin) const;
+
+    DECLARE_CLONABLE(Knight);
 };
 
 #endif

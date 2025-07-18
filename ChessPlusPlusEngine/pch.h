@@ -7,6 +7,9 @@
 #include "framework.h"
 #include <math.h>
 #include <algorithm>
-
+#include <iostream>
+#include <vector>
+#include <map>
+#include <unordered_map>
 
 #endif

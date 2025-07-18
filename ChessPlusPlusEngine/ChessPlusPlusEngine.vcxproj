@@ -21,9 +21,10 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="src\basic.h" />
     <ClInclude Include="src\ChessPlusPlusEngine.h" />
     <ClInclude Include="src\engine\engine.h" />
-    <ClInclude Include="src\pieces\base.h" />
+    <ClInclude Include="src\game.h" />
     <ClInclude Include="src\pieces\bishop.h" />
     <ClInclude Include="src\pieces\king.h" />
     <ClInclude Include="src\pieces\knight.h" />
@@ -39,9 +40,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\basic.cpp" />
     <ClCompile Include="src\ChessPlusPlusEngine.cpp" />
     <ClCompile Include="src\engine\engine.cpp" />
-    <ClCompile Include="src\pieces\base.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\pieces\bishop.cpp" />
     <ClCompile Include="src\pieces\king.cpp" />
     <ClCompile Include="src\pieces\knight.cpp" />

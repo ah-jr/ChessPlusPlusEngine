@@ -38,9 +38,6 @@
     <ClInclude Include="src\pieces\rook.h">
       <Filter>Source\src\pieces</Filter>
     </ClInclude>
-    <ClInclude Include="src\pieces\base.h">
-      <Filter>Source\src\pieces</Filter>
-    </ClInclude>
     <ClInclude Include="src\pieces\bishop.h">
       <Filter>Source\src\pieces</Filter>
     </ClInclude>
@@ -51,6 +48,12 @@
       <Filter>Source\src\engine</Filter>
     </ClInclude>
     <ClInclude Include="src\ChessPlusPlusEngine.h">
+      <Filter>Source\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game.h">
+      <Filter>Source\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\basic.h">
       <Filter>Source\src</Filter>
     </ClInclude>
   </ItemGroup>
@@ -76,9 +79,6 @@
     <ClCompile Include="src\pieces\rook.cpp">
       <Filter>Source\src\pieces</Filter>
     </ClCompile>
-    <ClCompile Include="src\pieces\base.cpp">
-      <Filter>Source\src\pieces</Filter>
-    </ClCompile>
     <ClCompile Include="src\pieces\bishop.cpp">
       <Filter>Source\src\pieces</Filter>
     </ClCompile>
@@ -87,6 +87,12 @@
     </ClCompile>
     <ClCompile Include="src\engine\engine.cpp">
       <Filter>Source\src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\basic.cpp">
+      <Filter>Source\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
