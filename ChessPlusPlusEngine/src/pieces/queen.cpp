@@ -5,9 +5,11 @@
 ////////////////////////////////////////////////////////////////////
 /// Queen
 ///=================================================================
-Queen::Queen(Player team) 
-    : Piece(team, PieceType::QUEEN)
+Queen::Queen(Team team) 
+    : GenericPiece({ PieceType::QUEEN, team })
 {
+    moveInLines = true;
+    moveInDiagonals = true;
 }
 
 ///=================================================================
@@ -17,46 +19,40 @@ int Queen::getValue() const
 }
 
 ///=================================================================
-MoveInfo Queen::getMoveInfo(const Move& move) const
+int Queen::getMoveRange() const
 {
-    MoveInfo result;
-    result.type = MoveType::IMPOSSIBLE;
-
-    if (!move.isValid())
-        return result;
-
-    const Square& o = move.getOrigin();
-    const Square& d = move.getDestination();
-
-    int xDiff = std::abs(o.getX() - d.getX());
-    int yDiff = std::abs(o.getY() - d.getY());
-
-    if (xDiff != yDiff && xDiff * yDiff)
-        return result;
-
-    if (xDiff == yDiff) 
-    {
-        auto xVals = getValuesBetween(o.getX(), d.getX());
-        auto yVals = getValuesBetween(o.getY(), d.getY());
-
-        for (int i = 0; i < xDiff; i++)
-            result.path.push_back(Square(xVals[i], yVals[i]));
-    }
-
-    if (xDiff == 0)
-        for (int n : getValuesBetween(o.getY(), d.getY()))
-            result.path.push_back(Square(o.getX(), n));
-
-    if (yDiff == 0)
-        for (int n : getValuesBetween(o.getX(), d.getX()))
-            result.path.push_back(Square(n, o.getY()));
-
-    result.type = MoveType::REGULAR;
-    return result;
+    return 7;
 }
 
 ///=================================================================
-MoveInfoVec Queen::getAllMovesInfo(const Square& origin) const
+DirectionSet Queen::getMoveDirections() const
 {
-    return {};
+    return {
+        { -1, -1 },
+        { -1,  0 },
+        { -1,  1 },
+        {  0, -1 },
+        {  0,  1 },
+        {  1, -1 },
+        {  1,  0 },
+        {  1,  1 }
+    };
+}
+
+///=================================================================
+DirectionSet Queen::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
+MoveType Queen::getMoveType(const Move& move) const
+{
+    return getGenericMoveType(move);
+}
+
+///=================================================================
+SquareVec Queen::getMovePath(const Move& move) const
+{
+    return getGenericMovePath(move);
 }

@@ -5,31 +5,26 @@
 ////////////////////////////////////////////////////////////////////
 /// Generic Functions
 ///=================================================================
-std::vector<int> getValuesBetween(int a, int b)
+Team getOpponent(Team team)
 {
-    std::vector<int> result;
-
-    if (a == b)
-        return result;
-
-    const int increment = (a > b) ? -1 : 1; 
-
-    for (int i = a; i != b; i += increment)
-        result.push_back(i + increment);
-    
-    return result;
+    return team == Team::WHITE ? Team::BLACK : Team::WHITE;
 }
 
 ///=================================================================
-Player GetOpponent(Player player)
-{
-    return player == Player::WHITE ? Player::BLACK : Player::WHITE;
-}
-
-///=================================================================
-std::string  PieceTypeToString(PieceType e)
+std::string teamToString(Team e)
 {
     switch (e)
+    {
+    case Team::WHITE: return "White";
+    case Team::BLACK: return "Black";
+    default:          return "Unknown";
+    }
+}
+
+///=================================================================
+std::string  pieceTypeToString(PieceType type)
+{
+    switch (type)
     {
     case PieceType::PAWN:   return "Pawn";
     case PieceType::BISHOP: return "Bishop";
@@ -42,18 +37,19 @@ std::string  PieceTypeToString(PieceType e)
 }
 
 ///=================================================================
-std::string TeamToString(Player e)
+std::string  pieceInfoToString(PieceInfo info)
 {
-    switch (e)
-    {
-    case Player::WHITE: return "White";
-    case Player::BLACK: return "Black";
-    default:            return "Unknown";
-    }
+    return teamToString(info.team) + pieceTypeToString(info.type);
 }
 
 ////////////////////////////////////////////////////////////////////
 /// Square
+///=================================================================
+Square::Square()
+    : x(-1), y(-1)
+{
+}
+
 ///=================================================================
 Square::Square(const std::string& name)
     : x(-1), y(-1)
@@ -114,6 +110,12 @@ std::string Square::toString() const
 ////////////////////////////////////////////////////////////////////
 /// Move
 ///=================================================================
+Move::Move()
+    : o(Square()), d(Square())
+{
+}
+
+///=================================================================
 Move::Move(Square o, Square d)
     : o(o), d(d)
 {
@@ -143,25 +145,107 @@ const Square& Move::getDestination() const
     return d;
 }
 
+///=================================================================
+int Move::getDeltaX() const
+{
+    return d.getX() - o.getX();
+}
+
+
+///=================================================================
+int Move::getDeltaY() const
+{
+    return d.getY() - o.getY();
+}
+
+///=================================================================
+bool Move::sameDiagonal() const
+{
+    return std::abs(getDeltaX()) == std::abs(getDeltaY());
+}
+
+///=================================================================
+bool Move::sameLine() const
+{
+    return (getDeltaX() == 0 || getDeltaY() == 0);
+}
+
+///=================================================================
+Move Move::getOpposite() const
+{
+    return Move(d, o);
+}
+
 ////////////////////////////////////////////////////////////////////
 /// Piece
 ///=================================================================
-Piece::Piece(Player team, PieceType type)
+Piece::Piece(PieceInfo info)
+    : info(info)
 {
-    this->team = team;
-    this->type = type;
 }
 
 ///=================================================================
-PieceType Piece::getType() const
+const PieceInfo& Piece::getInfo() const
 {
-    return this->type;
+    return this->info;
 }
 
 ///=================================================================
-Player Piece::getTeam() const
+bool Piece::doesMoveInDirection(const Direction& direction) const
 {
-    return this->team;
+    auto directions = getMoveDirections();
+    if (directions.find(direction) != directions.end())
+        return true;
+
+    return false;
+}
+
+///=================================================================
+bool Piece::doesAttackInDirection(const Direction& direction) const
+{
+    auto directions = getAttackDirections();
+    if (directions.find(direction) != directions.end())
+        return true;
+
+    return false;
+}
+
+///=================================================================
+GenericPiece::GenericPiece(PieceInfo info)
+    : Piece(info)
+    , moveInLines(false)
+    , moveInDiagonals(false)
+{
+}
+
+///=================================================================
+MoveType GenericPiece::getGenericMoveType(const Move& move) const
+{
+    if (!move.isValid())
+        return MoveType::IMPOSSIBLE;
+
+    if (!((moveInLines && move.sameLine()) || (moveInDiagonals && move.sameDiagonal())))
+        return MoveType::IMPOSSIBLE;
+
+    return MoveType::REGULAR;
+}
+
+///=================================================================
+SquareVec GenericPiece::getGenericMovePath(const Move& move) const
+{
+    SquareVec result;
+
+    if (getMoveType(move) == MoveType::IMPOSSIBLE)
+        return result;
+
+    int xStep = (move.getDeltaX() == 0) ? 0 : (move.getDeltaX() > 0 ? 1 : -1);
+    int yStep = (move.getDeltaY() == 0) ? 0 : (move.getDeltaY() > 0 ? 1 : -1);
+    int steps = std::max(std::abs(move.getDeltaX()), std::abs(move.getDeltaY()));
+
+    for (int i = 1; i <= steps; ++i)
+        result.emplace_back(move.getOrigin().getX() + i * xStep, move.getOrigin().getY() + i * yStep);
+
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -178,6 +262,8 @@ void Board::clear()
     for (int x = 0; x < 8; x++)
         for (int y = 0; y < 8; y++)
             squares[Square(x, y).toString()] = nullptr;
+
+    piecePositions.clear();
 }
 
 ///=================================================================
@@ -196,9 +282,16 @@ bool Board::movePiece(const Move& move)
     if (!move.isValid())
         return false;
 
-    if (getPiece(move.getOrigin()) == nullptr)
+    const Piece* piece = getPiece(move.getOrigin());
+    if (piece == nullptr)
         return false;
 
+    const Piece* capture = getPiece(move.getDestination());
+    if (capture != nullptr)
+        piecePositions[pieceInfoToString(capture->getInfo())].erase(move.getDestination().toString());
+
+    piecePositions[pieceInfoToString(piece->getInfo())].erase(move.getOrigin().toString());
+    piecePositions[pieceInfoToString(piece->getInfo())].insert(move.getDestination().toString());
     squares[move.getDestination().toString()] = std::move(squares[move.getOrigin().toString()]);
     return true;
 }
@@ -209,16 +302,41 @@ bool Board::putPiece(const Square& square, const Piece& piece)
     if (!square.isValid())
         return false;
 
+    piecePositions[pieceInfoToString(piece.getInfo())].insert(square.toString());
     squares[square.toString()] = piece.clone();
     return true;
 }
 
 ///=================================================================
-bool Board::clearSquare(const Square& square)
+bool Board::insertPiece(const Square& square, std::unique_ptr<Piece> piece)
 {
     if (!square.isValid())
         return false;
 
-    squares[square.toString()] = nullptr;
+    piecePositions[pieceInfoToString(piece->getInfo())].insert(square.toString());
+    squares[square.toString()] = std::move(piece);
     return true;
+}
+
+///=================================================================
+std::unique_ptr<Piece> Board::removePiece(const Square& square)
+{
+    if (!square.isValid())
+        return nullptr;
+
+    const Piece* piece = getPiece(square);
+    if (piece != nullptr)
+    {
+        piecePositions[pieceInfoToString(piece->getInfo())].erase(square.toString());
+        return std::move(squares[square.toString()]);
+    }
+
+    return nullptr;
+}
+
+///=================================================================
+const std::set<std::string>* Board::getPiecePositions(const PieceInfo& info)
+{
+    auto it = piecePositions.find(pieceInfoToString(info));
+    return it != piecePositions.end() ? &it->second : nullptr;
 }

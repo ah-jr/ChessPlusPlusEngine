@@ -5,8 +5,8 @@
 ////////////////////////////////////////////////////////////////////
 /// Pawn
 ///=================================================================
-King::King(Player team) 
-    : Piece(team, PieceType::KING)
+King::King(Team team) 
+    : Piece({ PieceType::KING, team })
 {
 }
 
@@ -17,30 +17,56 @@ int King::getValue() const
 }
 
 ///=================================================================
-MoveInfo King::getMoveInfo(const Move& move) const
+int King::getMoveRange() const
 {
-    MoveInfo result;
-    result.type = MoveType::IMPOSSIBLE;
-
-    if (!move.isValid())
-        return result;
-
-    const Square& o = move.getOrigin();
-    const Square& d = move.getDestination();
-
-    if (std::abs(o.getX() - d.getX()) > 1)
-        return result;
-
-    if (std::abs(o.getY() - d.getY()) > 1)
-        return result;
-
-    result.path.push_back(d);
-    result.type = MoveType::REGULAR;
-    return result;
+    return 1;
 }
 
 ///=================================================================
-MoveInfoVec King::getAllMovesInfo(const Square& origin) const
+DirectionSet King::getMoveDirections() const
 {
-    return {};
+    return {
+        { -1, -1 },
+        { -1,  0 },
+        { -1,  1 },
+        {  0, -1 },        
+        {  0,  1 },
+        {  1, -1 },
+        {  1,  0 },
+        {  1,  1 }
+    };
 }
+
+///=================================================================
+DirectionSet King::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
+MoveType King::getMoveType(const Move& move) const
+{
+    if (!move.isValid())
+        return MoveType::IMPOSSIBLE;
+
+    if (std::abs(move.getDeltaX()) > 1)
+        return MoveType::IMPOSSIBLE;
+
+    if (std::abs(move.getDeltaY()) > 1)
+        return MoveType::IMPOSSIBLE;
+
+    return MoveType::REGULAR;
+}
+
+///=================================================================
+SquareVec King::getMovePath(const Move& move) const
+{
+    SquareVec result;
+
+    if (getMoveType(move) == MoveType::IMPOSSIBLE)
+        return result;
+
+    result.push_back(move.getDestination());
+    return result;
+}
+

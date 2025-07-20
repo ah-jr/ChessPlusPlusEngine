@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////////////////////
 /// Bishop
 ///=================================================================
-Bishop::Bishop(Player team) 
-    : Piece(team, PieceType::BISHOP)
+Bishop::Bishop(Team team) 
+    : GenericPiece({ PieceType::BISHOP, team })
 {
+    moveInDiagonals = true;
 }
 
 ///=================================================================
@@ -17,35 +18,36 @@ int Bishop::getValue() const
 }
 
 ///=================================================================
-MoveInfo Bishop::getMoveInfo(const Move& move) const
+int Bishop::getMoveRange() const
 {
-    MoveInfo result;
-    result.type = MoveType::IMPOSSIBLE;
-
-    if (!move.isValid())
-        return result;
-
-    const Square& o = move.getOrigin();
-    const Square& d = move.getDestination();
-
-    int xDiff = std::abs(o.getX() - d.getX());
-    int yDiff = std::abs(o.getY() - d.getY());
-
-    if (xDiff != yDiff)
-        return result;
-
-    auto xVals = getValuesBetween(o.getX(), d.getX());
-    auto yVals = getValuesBetween(o.getY(), d.getY());
-
-    for (int i = 0; i < xDiff; i++)
-        result.path.push_back(Square(xVals[i], yVals[i]));
-
-    result.type = MoveType::REGULAR;
-    return result;
+    return 7;
 }
 
 ///=================================================================
-MoveInfoVec Bishop::getAllMovesInfo(const Square& origin) const
+DirectionSet Bishop::getMoveDirections() const
 {
-    return {};
+    return {
+        { -1, -1 },
+        { -1,  1 },
+        {  1, -1 },
+        {  1,  1 }
+    };
+}
+
+///=================================================================
+DirectionSet Bishop::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
+MoveType Bishop::getMoveType(const Move& move) const
+{
+    return getGenericMoveType(move);
+}
+
+///=================================================================
+SquareVec Bishop::getMovePath(const Move& move) const
+{
+    return getGenericMovePath(move);
 }

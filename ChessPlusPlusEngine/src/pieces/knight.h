@@ -9,11 +9,14 @@
 class Knight : public Piece
 {
 public:
-    Knight(Player team); 
+    Knight(Team team); 
 
     int getValue() const;
-    MoveInfo getMoveInfo(const Move& move) const;
-    MoveInfoVec getAllMovesInfo(const Square& origin) const;
+    int getMoveRange() const;
+    DirectionSet getMoveDirections() const;
+    DirectionSet getAttackDirections() const;
+    MoveType getMoveType(const Move& move) const;
+    SquareVec getMovePath(const Move& move) const;
 
     DECLARE_CLONABLE(Knight);
 };

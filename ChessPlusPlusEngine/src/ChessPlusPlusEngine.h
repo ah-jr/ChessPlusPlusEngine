@@ -15,6 +15,7 @@ CHESS_API bool validate_move(int ox, int oy, int dx, int dy);
 CHESS_API bool init_game();
 CHESS_API bool get_piece(int x, int y, int* team, int* type);
 CHESS_API void get_next_move(int team, int* ox, int* oy, int* dx, int* dy);
+CHESS_API void get_valid_moves(int x, int y, int* outMoves, int* outCount);
 
 #ifdef __cplusplus
 }

@@ -6,14 +6,17 @@
 ////////////////////////////////////////////////////////////////////
 /// Bishop
 ///=================================================================
-class Bishop : public Piece
+class Bishop : public GenericPiece
 {
 public:
-    Bishop(Player team); 
+    Bishop(Team team); 
 
     int getValue() const;
-    MoveInfo getMoveInfo(const Move& move) const;
-    MoveInfoVec getAllMovesInfo(const Square& origin) const;
+    int getMoveRange() const;
+    DirectionSet getMoveDirections() const;
+    DirectionSet getAttackDirections() const;
+    MoveType getMoveType(const Move& move) const;
+    SquareVec getMovePath(const Move& move) const;
 
     DECLARE_CLONABLE(Bishop);
 };

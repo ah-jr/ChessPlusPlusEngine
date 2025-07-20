@@ -2,8 +2,10 @@
 
 #include "ChessPlusPlusEngine.h"
 #include "game.h"
+#include "engine/engine.h"
 
 Game m_game;
+Engine m_engine;
 
 ///=================================================================
 bool play_move(int ox, int oy, int dx, int dy)
@@ -24,8 +26,8 @@ bool get_piece(int x, int y, int* team, int* type)
 
     if (piece)
     {
-        *team = static_cast<int>(piece->getTeam());
-        *type = static_cast<int>(piece->getType());
+        *team = static_cast<int>(piece->getInfo().team);
+        *type = static_cast<int>(piece->getInfo().type);
 
         return true;
     }
@@ -42,10 +44,26 @@ bool init_game()
 
 void get_next_move(int team, int* ox, int* oy, int* dx, int* dy)
 {
-    //Move move = m_engine->getNextMove(m_board, static_cast<Player>(team), 6);
+    Move move = m_engine.getNextMove(&m_game, m_game.getBoard(), static_cast<Team>(team), 6);
 
-    //*ox = move.o.x;
-    //*oy = move.o.y;
-    //*dx = move.d.x;
-    //*dy = move.d.y;
+    *ox = move.getOrigin().getX();
+    *oy = move.getOrigin().getY();
+    *dx = move.getDestination().getX();
+    *dy = move.getDestination().getY();
+}
+
+void get_valid_moves(int x, int y, int* outMoves, int* outCount)
+{
+    Square origin(x, y);
+    SquareVec valid = m_game.getValidMoves(origin);
+
+    int count = 0;
+    for (const Square& sq : valid)
+    {
+        outMoves[count * 2 + 0] = sq.getX();
+        outMoves[count * 2 + 1] = sq.getY();
+        count++;
+    }
+
+    *outCount = count;
 }

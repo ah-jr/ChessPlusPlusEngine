@@ -5,8 +5,8 @@
 ////////////////////////////////////////////////////////////////////
 /// Knight
 ///=================================================================
-Knight::Knight(Player team) 
-    : Piece(team, PieceType::KNIGHT)
+Knight::Knight(Team team) 
+    : Piece({ PieceType::KNIGHT, team })
 {
 }
 
@@ -17,31 +17,52 @@ int Knight::getValue() const
 }
 
 ///=================================================================
-MoveInfo Knight::getMoveInfo(const Move& move) const
+int Knight::getMoveRange() const
 {
-    MoveInfo result;
-    result.type = MoveType::IMPOSSIBLE;
-
-    if (!move.isValid())
-        return result;
-
-    const Square& o = move.getOrigin();
-    const Square& d = move.getDestination();
-
-    int xDiff = std::abs(o.getX() - d.getX());
-    int yDiff = std::abs(o.getY() - d.getY());
-
-    if (xDiff * yDiff == 2)
-    {
-        result.type = MoveType::REGULAR;
-        result.path.push_back(d);
-    }
-    
-    return result;
+    return 1;
 }
 
 ///=================================================================
-MoveInfoVec Knight::getAllMovesInfo(const Square& origin) const
+DirectionSet Knight::getMoveDirections() const
 {
-    return {};
+    return {
+        { -2, -1 },
+        { -2,  1 },
+        { -1, -2 },
+        { -1,  2 },
+        {  1, -2 },
+        {  1,  2 },
+        {  2, -1 },
+        {  2,  1 }
+    };
+}
+
+///=================================================================
+DirectionSet Knight::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
+MoveType Knight::getMoveType(const Move& move) const
+{
+    if (!move.isValid())
+        return MoveType::IMPOSSIBLE;
+
+    if (abs(move.getDeltaX() * move.getDeltaY()) == 2)
+        return MoveType::REGULAR;
+
+    return MoveType::IMPOSSIBLE;
+}
+
+///=================================================================
+SquareVec Knight::getMovePath(const Move& move) const
+{
+    SquareVec result;
+
+    if (getMoveType(move) == MoveType::IMPOSSIBLE)
+        return result;
+
+    result.push_back(move.getDestination());
+    return result;
 }

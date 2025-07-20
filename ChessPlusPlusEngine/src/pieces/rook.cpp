@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////////////////////
 /// Rook
 ///=================================================================
-Rook::Rook(Player team) 
-    : Piece(team, PieceType::ROOK)
+Rook::Rook(Team team) 
+    : GenericPiece({ PieceType::ROOK, team })
 {
+    moveInLines = true;
 }
 
 ///=================================================================
@@ -17,43 +18,36 @@ int Rook::getValue() const
 }
 
 ///=================================================================
-MoveInfo Rook::getMoveInfo(const Move& move) const
+int Rook::getMoveRange() const
 {
-    MoveInfo result;
-    result.type = MoveType::IMPOSSIBLE;
-
-    if (!move.isValid())
-        return result;
-
-    const Square& o = move.getOrigin();
-    const Square& d = move.getDestination();
-
-    int xDiff = std::abs(o.getX() - d.getX());
-    int yDiff = std::abs(o.getY() - d.getY());
-
-    if (xDiff * yDiff)
-        return result;
-
-    if (xDiff == 0)
-    {
-        int sign = o.getY() < d.getY() ? 1 : -1;
-        for (int i = 1; i <= yDiff; i++)
-            result.path.push_back(Square(o.getX(), o.getY() + i * sign));
-    }
-
-    if (yDiff == 0)
-    {
-        int sign = o.getX() < d.getX() ? 1 : -1;
-        for (int i = 1; i <= xDiff; i++)
-            result.path.push_back(Square(o.getX() + i * sign, o.getY()));
-    }
-
-    result.type = MoveType::REGULAR;
-    return result;
+    return 7;
 }
 
 ///=================================================================
-MoveInfoVec Rook::getAllMovesInfo(const Square& origin) const
+DirectionSet Rook::getMoveDirections() const
 {
-    return {};
+    return {
+        { -1,  0 },
+        {  0, -1 },
+        {  0,  1 },
+        {  1,  0 },
+    };
+}
+
+///=================================================================
+DirectionSet Rook::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
+MoveType Rook::getMoveType(const Move& move) const
+{
+    return getGenericMoveType(move);
+}
+
+///=================================================================
+SquareVec Rook::getMovePath(const Move& move) const
+{
+    return getGenericMovePath(move);
 }

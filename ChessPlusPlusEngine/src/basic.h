@@ -22,9 +22,15 @@ enum class PieceType {
 };
 
 ///=================================================================
-enum class Player {
+enum class Team {
     WHITE = 0,
     BLACK = 1
+};
+
+///=================================================================
+struct PieceInfo {
+    PieceType type = PieceType::PAWN;
+    Team team = Team::WHITE;
 };
 
 ///=================================================================
@@ -40,24 +46,25 @@ enum class MoveType {
     LONG_CASTLE = 8
 };
 
+///=================================================================
+typedef std::pair<int, int> Direction;
+typedef std::set<Direction> DirectionSet;
+
 ////////////////////////////////////////////////////////////////////
 /// Generic Functions
 ///=================================================================
-std::vector<int> getValuesBetween(int a, int b);
-std::string PieceTypeToString(PieceType e);
-std::string TeamToString(Player player);
-Player GetOpponent(Player player);
+Team getOpponent(Team team);
+std::string teamToString(Team team);
+std::string pieceTypeToString(PieceType type);
+std::string pieceInfoToString(PieceInfo info);
 
 ////////////////////////////////////////////////////////////////////
 /// Square
 ///=================================================================
 class Square 
 {
-private:
-    int x;
-    int y;
-
 public:
+    Square();
     Square(const std::string& name);
     Square(int px, int py);
 
@@ -66,34 +73,36 @@ public:
     int getX() const;
     int getY() const;
     std::string toString() const;
+
+private:
+    int x;
+    int y;
 };
 
 typedef std::vector<Square> SquareVec;
-
-///=================================================================
-struct MoveInfo {
-    MoveType type;
-    SquareVec path;
-};
-
-typedef std::vector<MoveInfo> MoveInfoVec;
 
 ////////////////////////////////////////////////////////////////////
 /// Move
 ///=================================================================
 class Move 
 {
-private:
-    Square o;
-    Square d;
-
 public:
+    Move();
     Move(Square o, Square d);
 
     bool isValid() const;
     const Square& getOrigin() const;
     const Square& getDestination() const;
+    int getDeltaX() const;
+    int getDeltaY() const;
+    bool sameDiagonal() const;
+    bool sameLine() const;
+    Move getOpposite() const;
     std::string toString() const;
+
+private:
+    Square o;
+    Square d;
 };
 
 typedef std::vector<Square> MoveVec;
@@ -103,31 +112,44 @@ typedef std::vector<Square> MoveVec;
 ///=================================================================
 class Piece
 {
-protected:
-    PieceType type;
-    Player team;
-
 public:
-    Piece(Player team, PieceType type);
+    Piece(PieceInfo info);
     virtual std::unique_ptr<Piece> clone() const = 0;
 
-    PieceType getType() const;
-    Player getTeam() const;
+    const PieceInfo& getInfo() const;
+    bool doesMoveInDirection(const Direction& direction) const;
+    bool doesAttackInDirection(const Direction& direction) const;
 
     virtual int getValue() const = 0;
-    virtual MoveInfo getMoveInfo(const Move& move) const = 0;
-    virtual MoveInfoVec getAllMovesInfo(const Square& origin) const = 0;
+    virtual int getMoveRange() const = 0;
+    virtual DirectionSet getMoveDirections() const = 0;
+    virtual DirectionSet getAttackDirections() const = 0;
+    virtual MoveType getMoveType(const Move& move) const = 0;
+    virtual SquareVec getMovePath(const Move& move) const = 0;
+
+protected:
+    PieceInfo info;
 };
 
+///=================================================================
+class GenericPiece : public Piece
+{
+public:
+    GenericPiece(PieceInfo info);
+
+protected:
+    bool moveInLines;
+    bool moveInDiagonals;
+
+    MoveType getGenericMoveType(const Move& move) const;
+    SquareVec getGenericMovePath(const Move& move) const;
+};
 
 ////////////////////////////////////////////////////////////////////
 /// Board
 ///=================================================================
 class Board 
 {
-private:
-    std::unordered_map<std::string, std::unique_ptr<Piece>> squares;
-
 public:
     Board();
 
@@ -135,7 +157,13 @@ public:
     const Piece* getPiece(const Square& square) const;
     bool movePiece(const Move& move);
     bool putPiece(const Square& square, const Piece& piece);
-    bool clearSquare(const Square& square);
+    bool insertPiece(const Square& square, std::unique_ptr<Piece> piece);
+    std::unique_ptr<Piece> removePiece(const Square& square);
+    const std::set<std::string>* getPiecePositions(const PieceInfo& info);
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<Piece>> squares;
+    std::unordered_map<std::string, std::set<std::string>> piecePositions;
 };
 
 #endif
