@@ -54,9 +54,8 @@ typedef std::set<Direction> DirectionSet;
 /// Generic Functions
 ///=================================================================
 Team getOpponent(Team team);
-std::string teamToString(Team team);
-std::string pieceTypeToString(PieceType type);
-std::string pieceInfoToString(PieceInfo info);
+char getPieceChar(PieceType type);
+char getPieceChar(PieceInfo info);
 
 ////////////////////////////////////////////////////////////////////
 /// Square
@@ -159,11 +158,13 @@ public:
     bool putPiece(const Square& square, const Piece& piece);
     bool insertPiece(const Square& square, std::unique_ptr<Piece> piece);
     std::unique_ptr<Piece> removePiece(const Square& square);
-    const std::set<std::string>* getPiecePositions(const PieceInfo& info);
+    const std::set<std::string>* getPiecePositions(const PieceInfo& info) const;
+    std::string getBoardAsString() const;
+    float getPieceBalance() const;
 
 private:
     std::unordered_map<std::string, std::unique_ptr<Piece>> squares;
-    std::unordered_map<std::string, std::set<std::string>> piecePositions;
+    std::unordered_map<char, std::set<std::string>> piecePositions;
 };
 
 #endif

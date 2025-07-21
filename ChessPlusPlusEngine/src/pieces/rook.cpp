@@ -26,18 +26,18 @@ int Rook::getMoveRange() const
 ///=================================================================
 DirectionSet Rook::getMoveDirections() const
 {
+    return {};
+}
+
+///=================================================================
+DirectionSet Rook::getAttackDirections() const
+{
     return {
         { -1,  0 },
         {  0, -1 },
         {  0,  1 },
         {  1,  0 },
     };
-}
-
-///=================================================================
-DirectionSet Rook::getAttackDirections() const
-{
-    return getMoveDirections();
 }
 
 ///=================================================================

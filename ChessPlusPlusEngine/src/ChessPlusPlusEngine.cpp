@@ -44,7 +44,8 @@ bool init_game()
 
 void get_next_move(int team, int* ox, int* oy, int* dx, int* dy)
 {
-    Move move = m_engine.getNextMove(&m_game, m_game.getBoard(), static_cast<Team>(team), 6);
+    m_engine.setDepth(5);
+    Move move = m_engine.getNextMove(&m_game);
 
     *ox = move.getOrigin().getX();
     *oy = move.getOrigin().getY();

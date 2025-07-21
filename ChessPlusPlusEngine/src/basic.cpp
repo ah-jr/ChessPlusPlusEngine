@@ -11,35 +11,25 @@ Team getOpponent(Team team)
 }
 
 ///=================================================================
-std::string teamToString(Team e)
-{
-    switch (e)
-    {
-    case Team::WHITE: return "White";
-    case Team::BLACK: return "Black";
-    default:          return "Unknown";
-    }
-}
-
-///=================================================================
-std::string  pieceTypeToString(PieceType type)
+char getPieceChar(PieceType type)
 {
     switch (type)
     {
-    case PieceType::PAWN:   return "Pawn";
-    case PieceType::BISHOP: return "Bishop";
-    case PieceType::KNIGHT: return "Knight";
-    case PieceType::ROOK:   return "Rook";
-    case PieceType::KING:   return "King";
-    case PieceType::QUEEN:  return "Queen";
-    default:                return "Unknown";
+    case PieceType::PAWN:   return 'p';
+    case PieceType::BISHOP: return 'b';
+    case PieceType::KNIGHT: return 'n';
+    case PieceType::ROOK:   return 'r';
+    case PieceType::KING:   return 'k';
+    case PieceType::QUEEN:  return 'q';
+    default:                return '-';
     }
 }
 
 ///=================================================================
-std::string  pieceInfoToString(PieceInfo info)
+char getPieceChar(PieceInfo info)
 {
-    return teamToString(info.team) + pieceTypeToString(info.type);
+    char c = getPieceChar(info.type);
+    return info.team == Team::WHITE ? toupper(c) : c;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -288,10 +278,10 @@ bool Board::movePiece(const Move& move)
 
     const Piece* capture = getPiece(move.getDestination());
     if (capture != nullptr)
-        piecePositions[pieceInfoToString(capture->getInfo())].erase(move.getDestination().toString());
+        piecePositions[getPieceChar(capture->getInfo())].erase(move.getDestination().toString());
 
-    piecePositions[pieceInfoToString(piece->getInfo())].erase(move.getOrigin().toString());
-    piecePositions[pieceInfoToString(piece->getInfo())].insert(move.getDestination().toString());
+    piecePositions[getPieceChar(piece->getInfo())].erase(move.getOrigin().toString());
+    piecePositions[getPieceChar(piece->getInfo())].insert(move.getDestination().toString());
     squares[move.getDestination().toString()] = std::move(squares[move.getOrigin().toString()]);
     return true;
 }
@@ -302,7 +292,7 @@ bool Board::putPiece(const Square& square, const Piece& piece)
     if (!square.isValid())
         return false;
 
-    piecePositions[pieceInfoToString(piece.getInfo())].insert(square.toString());
+    piecePositions[getPieceChar(piece.getInfo())].insert(square.toString());
     squares[square.toString()] = piece.clone();
     return true;
 }
@@ -313,7 +303,7 @@ bool Board::insertPiece(const Square& square, std::unique_ptr<Piece> piece)
     if (!square.isValid())
         return false;
 
-    piecePositions[pieceInfoToString(piece->getInfo())].insert(square.toString());
+    piecePositions[getPieceChar(piece->getInfo())].insert(square.toString());
     squares[square.toString()] = std::move(piece);
     return true;
 }
@@ -327,7 +317,7 @@ std::unique_ptr<Piece> Board::removePiece(const Square& square)
     const Piece* piece = getPiece(square);
     if (piece != nullptr)
     {
-        piecePositions[pieceInfoToString(piece->getInfo())].erase(square.toString());
+        piecePositions[getPieceChar(piece->getInfo())].erase(square.toString());
         return std::move(squares[square.toString()]);
     }
 
@@ -335,8 +325,47 @@ std::unique_ptr<Piece> Board::removePiece(const Square& square)
 }
 
 ///=================================================================
-const std::set<std::string>* Board::getPiecePositions(const PieceInfo& info)
+const std::set<std::string>* Board::getPiecePositions(const PieceInfo& info) const
 {
-    auto it = piecePositions.find(pieceInfoToString(info));
+    auto it = piecePositions.find(getPieceChar(info));
     return it != piecePositions.end() ? &it->second : nullptr;
+}
+
+///=================================================================
+std::string Board::getBoardAsString() const
+{
+    std::string board; 
+    board.reserve(64);
+
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            const Piece* piece = getPiece(Square(x, y));
+            if (piece == nullptr)
+                board += '-';
+            else
+                board += getPieceChar(piece->getInfo());
+        }  
+    }
+
+    return board;
+}
+
+///=================================================================
+float Board::getPieceBalance() const
+{
+    float evaluation = 0.f;
+
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            const Piece* piece = getPiece(Square(x, y));
+            if (piece != nullptr)
+                evaluation += piece->getValue() * (piece->getInfo().team == Team::WHITE ? 1 : -1);
+        }
+    }
+
+    return evaluation;
 }

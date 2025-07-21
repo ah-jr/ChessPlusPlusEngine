@@ -19,7 +19,7 @@ class Game
 public:
     Game();
 
-    /*const */Board* getBoard();
+    const Board* getBoard();
 
     Team getCurrentTurn();
     //const MoveVec getValidMoves();

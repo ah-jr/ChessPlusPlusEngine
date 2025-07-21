@@ -17,7 +17,7 @@ Game::Game()
 }
 
 ///=================================================================
-Board* Game::getBoard()
+const Board* Game::getBoard()
 {
     return &board;
 }
@@ -39,33 +39,46 @@ SquareVec Game::getValidMoves(const Square& origin)
     if (piece == nullptr)
         return result;
 
-    for (const Direction& dir : piece->getMoveDirections())
+    DirectionSet moves = piece->getMoveDirections();
+    DirectionSet attacks = piece->getAttackDirections();
+    
+    std::vector<std::pair<const DirectionSet&, bool>> allDirections = {
+        {moves, false},
+        {attacks, true}
+    };
+
+    for (auto& dir : allDirections)
     {
-        auto dx = dir.first;
-        auto dy = dir.second;
+        const DirectionSet& directions = dir.first;
+        bool isAttack = dir.second;
 
-        int x = origin.getX();
-        int y = origin.getY();
-
-        for (int j = 0; j < piece->getMoveRange(); j++)
+        for (const Direction& dir : directions)
         {
-            x += dx;
-            y += dy;
+            int dx = dir.first;
+            int dy = dir.second;
 
-            Square dest(x, y);
-            if (!dest.isValid())
-                break;
+            int x = origin.getX();
+            int y = origin.getY();
 
-            const Piece* capture = board.getPiece(dest);
-            if (capture != nullptr)
+            for (int j = 0; j < piece->getMoveRange(); j++)
             {
-                if (capture->getInfo().team != piece->getInfo().team)
-                    result.push_back(dest);
+                x += dx;
+                y += dy;
 
-                break;
+                Square dest(x, y);
+                if (!dest.isValid())
+                    break;
+
+                const Piece* target = board.getPiece(dest);
+                if (target != nullptr)
+                {
+                    if (isAttack && target->getInfo().team != piece->getInfo().team)
+                        result.push_back(dest);
+                    break;
+                }
+
+                result.push_back(dest);
             }
-
-            result.push_back(dest);
         }
     }
 

@@ -27,6 +27,12 @@ int Queen::getMoveRange() const
 ///=================================================================
 DirectionSet Queen::getMoveDirections() const
 {
+    return {};
+}
+
+///=================================================================
+DirectionSet Queen::getAttackDirections() const
+{
     return {
         { -1, -1 },
         { -1,  0 },
@@ -37,12 +43,6 @@ DirectionSet Queen::getMoveDirections() const
         {  1,  0 },
         {  1,  1 }
     };
-}
-
-///=================================================================
-DirectionSet Queen::getAttackDirections() const
-{
-    return getMoveDirections();
 }
 
 ///=================================================================
