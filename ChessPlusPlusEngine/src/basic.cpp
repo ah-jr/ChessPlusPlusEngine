@@ -247,6 +247,23 @@ Board::Board()
 }
 
 ///=================================================================
+Board Board::copy() const
+{
+    Board board;
+    board.piecePositions = piecePositions;
+
+    for (int x = 0; x < 8; x++)
+        for (int y = 0; y < 8; y++)
+        {
+            const Piece* piece = getPiece(Square(x, y));
+            if (piece != nullptr)
+                board.putPiece(Square(x, y), piece->clone());
+        }
+            
+    return board;
+}
+
+///=================================================================
 void Board::clear()
 {
     for (int x = 0; x < 8; x++)
@@ -298,7 +315,7 @@ bool Board::putPiece(const Square& square, const Piece& piece)
 }
 
 ///=================================================================
-bool Board::insertPiece(const Square& square, std::unique_ptr<Piece> piece)
+bool Board::putPiece(const Square& square, std::unique_ptr<Piece> piece)
 {
     if (!square.isValid())
         return false;
@@ -350,22 +367,4 @@ std::string Board::getBoardAsString() const
     }
 
     return board;
-}
-
-///=================================================================
-float Board::getPieceBalance() const
-{
-    float evaluation = 0.f;
-
-    for (int x = 0; x < 8; x++)
-    {
-        for (int y = 0; y < 8; y++)
-        {
-            const Piece* piece = getPiece(Square(x, y));
-            if (piece != nullptr)
-                evaluation += piece->getValue() * (piece->getInfo().team == Team::WHITE ? 1 : -1);
-        }
-    }
-
-    return evaluation;
 }

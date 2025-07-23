@@ -25,12 +25,6 @@ int King::getMoveRange() const
 ///=================================================================
 DirectionSet King::getMoveDirections() const
 {
-    return {};
-}
-
-///=================================================================
-DirectionSet King::getAttackDirections() const
-{
     return {
         { -1, -1 },
         { -1,  0 },
@@ -44,13 +38,30 @@ DirectionSet King::getAttackDirections() const
 }
 
 ///=================================================================
+DirectionSet King::getAttackDirections() const
+{
+    return getMoveDirections();
+}
+
+///=================================================================
 MoveType King::getMoveType(const Move& move) const
 {
     if (!move.isValid())
         return MoveType::IMPOSSIBLE;
 
     if (std::abs(move.getDeltaX()) > 1)
+    {
+        if (std::abs(move.getDeltaY()) != 0)
+            return MoveType::IMPOSSIBLE;
+
+        int dir = (info.team == Team::WHITE) ? 1 : -1;
+        if (move.getDeltaX() == 2 * dir)
+            return MoveType::SHORT_CASTLE;
+        if (move.getDeltaX() == -2 * dir)
+            return MoveType::LONG_CASTLE;
+
         return MoveType::IMPOSSIBLE;
+    } 
 
     if (std::abs(move.getDeltaY()) > 1)
         return MoveType::IMPOSSIBLE;
@@ -62,9 +73,17 @@ MoveType King::getMoveType(const Move& move) const
 SquareVec King::getMovePath(const Move& move) const
 {
     SquareVec result;
+    const MoveType& type = getMoveType(move);
 
-    if (getMoveType(move) == MoveType::IMPOSSIBLE)
+    if (type == MoveType::IMPOSSIBLE)
         return result;
+
+    int dir = (info.team == Team::WHITE) ? 1 : -1;
+    if (type == MoveType::SHORT_CASTLE)
+        result.emplace_back(move.getOrigin().getX() + dir, move.getOrigin().getY());
+
+    if (type == MoveType::LONG_CASTLE)
+        result.emplace_back(move.getOrigin().getX() - dir, move.getOrigin().getY());
 
     result.push_back(move.getDestination());
     return result;

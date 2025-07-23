@@ -27,13 +27,11 @@ DirectionSet Pawn::getMoveDirections() const
 {
     if (info.team == Team::WHITE)
         return {
-            {  0,  1 },
-            {  0,  2 },
+            {  0,  1 }
         };
 
     return {
-        {  0, -1 },
-        {  0, -2 },
+        {  0, -1 }
     };
 }
 

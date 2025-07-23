@@ -10,23 +10,27 @@
 class Engine
 {
 public:
-    Move getNextMove(Game* game);
+    Move getNextMove(Game* referenceGame);
     void setDepth(int depth);
 
 private:
+    MoveVec getValidMoves(const Square& origin);
     float getPieceEvaluation(const Square& position, const Piece* piece);
-    float getNextMoveR(Game* game, int step, float alpha, float beta);
+    float getNextMoveR(int step, float alpha, float beta, bool maximize);
 
+    Board board;
+    Team playerTeam;
     Move bestMove;
     int depth;
-    std::vector<Square> whitePieceLocations;
-    std::vector<Square> blackPieceLocations;
+    std::unordered_set<std::string> whitePieceLocations;
+    std::unordered_set<std::string> blackPieceLocations;
 
+    float initialEvaluation;
     float currentEvaluation;
 
     std::unordered_map<std::string, float> cache;
     std::string boardString;
-    Team player;
+    Team stepTeam;
     int totalCalls;
     int skippedCalls;
     int evaluations;

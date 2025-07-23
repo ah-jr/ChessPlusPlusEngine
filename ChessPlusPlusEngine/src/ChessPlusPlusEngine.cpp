@@ -44,7 +44,7 @@ bool init_game()
 
 void get_next_move(int team, int* ox, int* oy, int* dx, int* dy)
 {
-    m_engine.setDepth(5);
+    m_engine.setDepth(8);
     Move move = m_engine.getNextMove(&m_game);
 
     *ox = move.getOrigin().getX();
@@ -67,4 +67,11 @@ void get_valid_moves(int x, int y, int* outMoves, int* outCount)
     }
 
     *outCount = count;
+}
+
+void get_board_string(int* size, char* string)
+{
+    std::string boardString = m_game.getBoard()->getBoardAsString();
+    *size = boardString.size();
+    std::memcpy(string, boardString.c_str(), *size);
 }

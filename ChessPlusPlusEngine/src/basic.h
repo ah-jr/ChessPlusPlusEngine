@@ -40,10 +40,11 @@ enum class MoveType {
     PAWN_MOVE = 2,
     PAWN_DOUBLE_MOVE = 3,
     PAWN_CAPTURE = 4,
-    PAWN_PROMOTION = 5,
-    PAWN_CAPTURE_PROMOTION = 6,
-    SHORT_CASTLE = 7,
-    LONG_CASTLE = 8
+    PAWN_CAPTURE_EN_PASSANT = 5,
+    PAWN_PROMOTION = 6,
+    PAWN_CAPTURE_PROMOTION = 7,
+    SHORT_CASTLE = 8,
+    LONG_CASTLE = 9
 };
 
 ///=================================================================
@@ -104,7 +105,7 @@ private:
     Square d;
 };
 
-typedef std::vector<Square> MoveVec;
+typedef std::vector<Move> MoveVec;
 
 ////////////////////////////////////////////////////////////////////
 /// Piece
@@ -152,15 +153,15 @@ class Board
 public:
     Board();
 
+    Board copy() const;
     void clear();
     const Piece* getPiece(const Square& square) const;
     bool movePiece(const Move& move);
     bool putPiece(const Square& square, const Piece& piece);
-    bool insertPiece(const Square& square, std::unique_ptr<Piece> piece);
+    bool putPiece(const Square& square, std::unique_ptr<Piece> piece);
     std::unique_ptr<Piece> removePiece(const Square& square);
     const std::set<std::string>* getPiecePositions(const PieceInfo& info) const;
     std::string getBoardAsString() const;
-    float getPieceBalance() const;
 
 private:
     std::unordered_map<std::string, std::unique_ptr<Piece>> squares;

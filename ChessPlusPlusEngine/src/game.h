@@ -8,6 +8,8 @@ struct MoveHistoryEvent {
     MoveType type = MoveType::IMPOSSIBLE;
     Move move;
     Team team = Team::WHITE;
+    bool disableShortCastle;
+    bool disableLongCastle;
     std::unique_ptr<Piece> capturedPiece = nullptr;
 };
 
@@ -22,8 +24,8 @@ public:
     const Board* getBoard();
 
     Team getCurrentTurn();
-    //const MoveVec getValidMoves();
     SquareVec getValidMoves(const Square& origin);
+    float getPieceBalance();
 
     bool isMoveValid(const Move& move);
     bool makeMove(const Move& move);
@@ -37,21 +39,23 @@ private:
     bool isSquareAttacked(const Square& square);
     bool isPathWayClear(const SquareVec& path);
     bool isPathDestinationClear(const SquareVec& path);
+    bool isPathAttacked(const SquareVec& path);
     bool isPathDestinationCapturable(const SquareVec& path);
+    bool isValidEnPassant(const Move& move);
     bool isPositionCheck();
+
     MoveType getMoveType(const Move& move);
     MoveType getMoveTypeInGameContext(const Move& move);
 
     bool pushMove(const MoveType& type, const Move& move);
     bool popMove();
 
-    // moveHistory
-    // state 
-    // ...
-
     Board board;
     Team currentTurn;
     std::stack<MoveHistoryEvent> moveHistory;
+
+    std::map<Team, bool> longCastleStatus;
+    std::map<Team, bool> shortCastleStatus;
 };
 
 #endif

@@ -39,12 +39,12 @@ SquareVec Game::getValidMoves(const Square& origin)
     if (piece == nullptr)
         return result;
 
-    DirectionSet moves = piece->getMoveDirections();
     DirectionSet attacks = piece->getAttackDirections();
+    DirectionSet moves = piece->getMoveDirections();
     
     std::vector<std::pair<const DirectionSet&, bool>> allDirections = {
-        {moves, false},
-        {attacks, true}
+        {attacks, true},
+        {moves, false}
     };
 
     for (auto& dir : allDirections)
@@ -86,6 +86,24 @@ SquareVec Game::getValidMoves(const Square& origin)
 }
 
 ///=================================================================
+float Game::getPieceBalance()
+{
+    float evaluation = 0.f;
+
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            const Piece* piece = board.getPiece(Square(x, y));
+            if (piece != nullptr)
+                evaluation += piece->getValue() * (piece->getInfo().team == Team::WHITE ? 1 : -1);
+        }
+    }
+
+    return evaluation;
+}
+
+///=================================================================
 bool Game::isMoveValid(const Move& move)
 {
     return getMoveTypeInGameContext(move) != MoveType::IMPOSSIBLE;
@@ -118,6 +136,14 @@ bool Game::undoLastMove()
 ///=================================================================
 void Game::restart()
 {
+    while (!moveHistory.empty())
+        moveHistory.pop();
+
+    shortCastleStatus[Team::WHITE] = true;
+    shortCastleStatus[Team::BLACK] = true;
+    longCastleStatus[Team::WHITE] = true;
+    longCastleStatus[Team::BLACK] = true;
+
     // White pieces
     board.putPiece(Square("a1"), Rook(Team::WHITE));
     board.putPiece(Square("b1"), Knight(Team::WHITE));
@@ -231,12 +257,43 @@ bool Game::isPathDestinationClear(const SquareVec& path)
 }
 
 ///=================================================================
+bool Game::isPathAttacked(const SquareVec& path)
+{
+    for (int i = 0; i < path.size(); i++)
+        if (isSquareAttacked(path[i]))
+            return true;
+
+    return false;
+}
+
+///=================================================================
 bool Game::isPathDestinationCapturable(const SquareVec& path)
 {
     if (isPathDestinationClear(path))
         return false;
 
     return board.getPiece(path.back())->getInfo().team != currentTurn;
+}
+
+///=================================================================
+bool Game::isValidEnPassant(const Move& move)
+{
+    if (moveHistory.empty())
+        return false;
+
+    const MoveHistoryEvent& lastMove = moveHistory.top();
+    
+    if (lastMove.type == MoveType::PAWN_DOUBLE_MOVE)
+    {
+        const Square& lastMoveSquare = lastMove.move.getDestination();
+
+        if (currentTurn == Team::WHITE)
+            return move.getDestination() == Square(lastMoveSquare.getX(), lastMoveSquare.getY() + 1);
+        else
+            return move.getDestination() == Square(lastMoveSquare.getX(), lastMoveSquare.getY() - 1);
+    }
+
+    return false;
 }
 
 ///=================================================================
@@ -252,45 +309,6 @@ bool Game::isPositionCheck()
 
     Square kingPosition(*positions->begin());   
     return isSquareAttacked(kingPosition);
-
-    //Move kingToPiece(kingPosition, move.getOrigin());
-
-    //if (kingToPiece.sameDiagonal() || kingToPiece.sameLine())
-    //{
-    //    int xStep = (kingToPiece.getDeltaX() == 0) ? 0 : (kingToPiece.getDeltaX() > 0 ? 1 : -1);
-    //    int yStep = (kingToPiece.getDeltaY() == 0) ? 0 : (kingToPiece.getDeltaY() > 0 ? 1 : -1);
-
-    //    int x = kingPosition.getX();
-    //    int y = kingPosition.getY();
-
-    //    for (int range = 1; range <= 7; range++)
-    //    {
-    //        x += xStep;
-    //        y += yStep;
-
-    //        Square dest(x, y);
-    //        if (!dest.isValid())
-    //            break;
-
-    //        if (dest == move.getOrigin())
-    //            continue;
-
-    //        if (dest == move.getDestination())
-    //            return false;
-
-    //        const Piece* capture = board.getPiece(dest);
-    //        if (capture != nullptr)
-    //        {
-    //            if (capture->getInfo().team == currentTurn)
-    //                return false;
-
-    //            if (capture->doesMoveInDirection({ xStep, yStep }) && capture->getMoveRange() >= range)
-    //                return true;
-    //        }
-    //    }
-    //}
-
-    //return false;
 }
 
 ///=================================================================
@@ -309,7 +327,7 @@ MoveType Game::getMoveType(const Move& move)
 ///=================================================================
 MoveType Game::getMoveTypeInGameContext(const Move& move)
 {
-    const MoveType& type = getMoveType(move);
+    MoveType type = getMoveType(move);
     if (type == MoveType::IMPOSSIBLE)
         return type;
 
@@ -332,14 +350,39 @@ MoveType Game::getMoveTypeInGameContext(const Move& move)
             return MoveType::IMPOSSIBLE;
         break;
 
-    case MoveType::PAWN_CAPTURE:
+    case MoveType::PAWN_CAPTURE:        
+        if (isValidEnPassant(move))
+        {
+            type = MoveType::PAWN_CAPTURE_EN_PASSANT;
+            break;
+        }
+        [[fallthrough]]
+
     case MoveType::PAWN_CAPTURE_PROMOTION:
-        if (!isPathDestinationCapturable(path)) // + en passant
+        if (!isPathDestinationCapturable(path))
             return MoveType::IMPOSSIBLE;
         break;
 
     case MoveType::SHORT_CASTLE:
+        if (!shortCastleStatus[currentTurn])
+            return MoveType::IMPOSSIBLE;
+
+        if (isSquareAttacked(move.getOrigin()) || isPathAttacked(path) || !isPathDestinationClear(path) || !isPathWayClear(path))
+            return MoveType::IMPOSSIBLE;
+
+        break;
+
     case MoveType::LONG_CASTLE:
+        if (!longCastleStatus[currentTurn])
+            return MoveType::IMPOSSIBLE;
+
+        if (isSquareAttacked(move.getOrigin()) || isPathAttacked(path) || !isPathDestinationClear(path) || !isPathWayClear(path))
+            return MoveType::IMPOSSIBLE;
+
+        // The square next to the rook must also be empty
+        if (board.getPiece(Square(1, (currentTurn == Team::WHITE ? 0 : 7))) != nullptr)
+            return MoveType::IMPOSSIBLE;
+
         break;
 
     default:
@@ -359,6 +402,7 @@ MoveType Game::getMoveTypeInGameContext(const Move& move)
 bool Game::pushMove(const MoveType& type, const Move& move)
 {
     MoveHistoryEvent event;
+    int castleRow = (currentTurn == Team::WHITE ? 0 : 7);
 
     switch (type)
     {
@@ -375,6 +419,15 @@ bool Game::pushMove(const MoveType& type, const Move& move)
         board.movePiece(move);
         break;
 
+    case MoveType::PAWN_CAPTURE_EN_PASSANT:
+    {
+        int captureY = move.getDestination().getY() + (currentTurn == Team::WHITE ? -1 : 1);
+        Square captureSquare = Square(move.getDestination().getX(), captureY);
+        event.capturedPiece = board.removePiece(captureSquare);
+        board.movePiece(move);
+        break;
+    }
+
     case MoveType::PAWN_CAPTURE_PROMOTION:
         event.capturedPiece = board.removePiece(move.getDestination());
         [[fallthrough]];
@@ -385,11 +438,58 @@ bool Game::pushMove(const MoveType& type, const Move& move)
         break;
 
     case MoveType::SHORT_CASTLE:
+    { 
+        Square rookOrigin = Square(7, castleRow);
+        Square rookDest = Square(5, castleRow);
+        board.movePiece(Move(rookOrigin, rookDest));
+        board.movePiece(move);
+        break;
+    }
     case MoveType::LONG_CASTLE:
+    {
+        Square rookOrigin = Square(0, castleRow);
+        Square rookDest = Square(3, castleRow);
+        board.movePiece(Move(rookOrigin, rookDest));
+        board.movePiece(move);
+        break;
+    }
 
     default:
         return false;
     }
+
+    event.disableShortCastle = false;
+    event.disableLongCastle = false;
+
+    const Piece* piece = board.getPiece(move.getDestination());
+    if (piece->getInfo().type == PieceType::KING)
+    {
+        if (shortCastleStatus[currentTurn])
+        {
+            shortCastleStatus[currentTurn] = false;
+            event.disableShortCastle = true;
+        }
+
+        if (longCastleStatus[currentTurn])
+        {
+            longCastleStatus[currentTurn] = false;
+            event.disableLongCastle = true;
+        }
+    }
+    else if (piece->getInfo().type == PieceType::ROOK)
+    {
+        if (move.getOrigin() == Square(7, castleRow) && shortCastleStatus[currentTurn])
+        {
+            shortCastleStatus[currentTurn] = false;
+            event.disableShortCastle = true;
+        }
+        else if (move.getOrigin() == Square(0, castleRow) && longCastleStatus[currentTurn])
+        {
+            longCastleStatus[currentTurn] = false;
+            event.disableLongCastle = true;
+        }
+    }
+
 
     event.move = move;
     event.type = type;
@@ -404,10 +504,12 @@ bool Game::popMove()
     if (moveHistory.empty())
         return false;
 
+    int castleRow = (currentTurn == Team::WHITE ? 0 : 7);
+
     MoveHistoryEvent& event = moveHistory.top();
     board.movePiece(event.move.getOpposite());
     if (event.capturedPiece != nullptr)
-        board.insertPiece(event.move.getDestination(), std::move(event.capturedPiece));
+        board.putPiece(event.move.getDestination(), std::move(event.capturedPiece));
 
     switch (event.type)
     {
@@ -423,11 +525,29 @@ bool Game::popMove()
         break;
 
     case MoveType::SHORT_CASTLE:
+    {
+        Square rookOrigin = Square(5, castleRow);
+        Square rookDest = Square(7, castleRow);
+        board.movePiece(Move(rookOrigin, rookDest));
+        break;
+    }
     case MoveType::LONG_CASTLE:
+    {
+        Square rookOrigin = Square(3, castleRow);
+        Square rookDest = Square(0, castleRow);
+        board.movePiece(Move(rookOrigin, rookDest));
+        break;
+    }
 
     default:
         break;
     }
+
+    if (event.disableShortCastle)
+        shortCastleStatus[currentTurn] = true;
+
+    if (event.disableLongCastle)
+        longCastleStatus[currentTurn] = true;
 
     moveHistory.pop();
     return true;

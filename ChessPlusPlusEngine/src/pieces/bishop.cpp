@@ -26,18 +26,18 @@ int Bishop::getMoveRange() const
 ///=================================================================
 DirectionSet Bishop::getMoveDirections() const
 {
-    return {};
-}
-
-///=================================================================
-DirectionSet Bishop::getAttackDirections() const
-{
     return {
         { -1, -1 },
         { -1,  1 },
         {  1, -1 },
         {  1,  1 }
     };
+}
+
+///=================================================================
+DirectionSet Bishop::getAttackDirections() const
+{
+    return getMoveDirections();
 }
 
 ///=================================================================

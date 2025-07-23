@@ -5,6 +5,7 @@
 #define NOMINMAX
 
 #include "framework.h"
+#include <cmath>
 #include <math.h>
 #include <algorithm>
 #include <iostream>
@@ -12,6 +13,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 
 #endif
